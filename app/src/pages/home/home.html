@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Miffy</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+	<ion-item>
+	  <ion-range [(ngModel)]="brightness" (ngModelChange)="onBrightnessChange($event)">
+	    <ion-icon range-left small name="sunny" min="35"></ion-icon>
+	    <ion-icon range-right name="sunny" max="100"></ion-icon>
+	  </ion-range>
+	</ion-item>
+	<ion-item>
+	  <ion-range [(ngModel)]="speed" (ngModelChange)="onSpeedChange($event)">
+	    <ion-icon range-left small name="speedometer"></ion-icon>
+	    <ion-icon range-right name="speedometer"></ion-icon>
+	  </ion-range>
+	</ion-item>
+</ion-content>
