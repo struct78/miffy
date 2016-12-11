@@ -22,6 +22,15 @@ export class HomePage {
 		console.log( e );
 	}
 
+	onPowerChange( power : boolean ) {
+		console.log( status );
+		this.arduino
+			.setPower( power )
+			.subscribe( ( data ) => {
+				console.log( data );
+			});
+	}
+
 	onBrightnessChange( brightness : number ) {
 		this.arduino
 			.setBrightness( brightness )

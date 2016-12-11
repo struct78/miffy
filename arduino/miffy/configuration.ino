@@ -1,10 +1,12 @@
 enum Pattern {
   WIPE,
-  RADIAL
+  RADIAL,
+  PULSE
 };
 
 
 // Neomatrix
-bool on = true;
-float theta = 0.02;
+bool power = true;
+float theta = 0.01;
+int brightness = 50;
 Pattern pattern = RADIAL;

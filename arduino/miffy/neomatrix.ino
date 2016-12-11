@@ -5,37 +5,46 @@ float delta = 0;
 
 Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(cols, rows, pin, NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_COLUMNS + NEO_MATRIX_PROGRESSIVE, NEO_GRB + NEO_KHZ800);
 
-
 void neomatrix_setup() {
   matrix.begin();
-  matrix.setBrightness( 10 );
+  matrix.setBrightness( get_neomatrix_brightness() );
   matrix.fillScreen( matrix.Color( 255, 255, 255 ) );
   matrix.show();
 }
 
-void neomatrix_toggle() {
-  on = !on;
+void set_neomatrix_power( bool power ) {
+  power = power;
 }
 
-void neomatrix_off() {
-  on = false;
+
+bool get_neomatrix_power() {
+  return power;
 }
 
-void neomatrix_on() {
-  on = true;
+void set_neomatrix_speed( float t ) {
+  theta = (float) constrain(t, 1, 100) / 100;
 }
 
-bool neomatrix_status() {
-  return on;
+uint8_t get_neomatrix_speed() {
+  return (int) theta * 100;
+}
+
+void set_neomatrix_brightness( int t ) {
+  brightness = constrain(t, 1, 255);
+}
+
+uint8_t get_neomatrix_brightness() {
+  return (int) brightness;
 }
 
 void neomatrix_loop() {
   uint16_t x, y, z;
   float hue = 0.0;
   
-  if (on) {
+  if ( get_neomatrix_power() ) {
+    matrix.setBrightness( get_neomatrix_brightness() );
+    
     delta += theta;
-
     for ( x = 0 ; x < cols ; x++ ) {
       for ( y = 0 ; y < rows ; y++ ) {
         float distance = dist( (float)cols/2, (float)rows/2, (float)x, (float)y );
@@ -63,14 +72,7 @@ void neomatrix_loop() {
     
     matrix.show(); 
   }
-  else {
-    matrix.fillScreen(0);
-    matrix.show();
-  }
 }
-
-
-
 
 float HueToRGB( float p, float q, float t ) {
   if ( t < 0 ) t += 1.0;
@@ -80,8 +82,6 @@ float HueToRGB( float p, float q, float t ) {
   if ( t < 2/3.0 ) return p + ( q - p ) * ( 2/3.0 - t ) * 6;
   return p;
 }
-
-
 
 uint16_t HSLtoRGB( float h, float s, float l ) {
     float r, g, b;

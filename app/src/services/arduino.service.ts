@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
-import { Subject }    from 'rxjs/Subject';
+import { Subject } from 'rxjs/Subject';
 import { Observable } from "rxjs/Observable";
 import { SQLite} from 'ionic-native';
 import { Storage } from '@ionic/storage';
@@ -18,7 +18,6 @@ export class ArduinoService {
 	private debounceTime = 500;
 
 	constructor( private http : Http, private storage: Storage ) {
-		//this.storage.clear();
 		this.saveDefault( 'speed' , 0.01 );
 		this.saveDefault( 'pattern' , Patterns.WIPE );
 		this.saveDefault( 'on', false );
@@ -54,9 +53,7 @@ export class ArduinoService {
 									this.savePreference( options.key || options.operation, options.value );
 									return response.json();
 								} )
-								.catch( () =>  {
-										return Observable.throw( { error: true } );
-								});
+								.catch( this.catchError );
 						});
 				}
 
@@ -69,7 +66,7 @@ export class ArduinoService {
 								.map( ( response: Response ) => {
 									this.saveResponse( response, options );
 								})
-								.catch( this.getError );
+								.catch( this.catchError );
 						});
 				}
 			})
@@ -82,7 +79,7 @@ export class ArduinoService {
 		return response.json();
 	}
 
-	private getError( ex: Response | any ) : Observable<any> {
+	private catchError( ex: Response | any ) : Observable<any> {
 			let message: string;
 
 			if ( ex instanceof Response ) {
@@ -130,11 +127,21 @@ export class ArduinoService {
 	/**
 	 * @name setSpeed
 	 * @description Sets the speed of the colour cycle. Range 1 - 100. 1 being the slowest.
-	 * @param {number} brightness
+	 * @param {number} speed
 	 * @return {Subject<any>} client
 	**/
 	setSpeed( speed: number ) : Observable<any> {
 		return this.post( 'speed', speed );
+	}
+
+	/**
+	 * @name setPower
+	 * @description Toggles the power of the lamp. The Arduino is still running, but the LEDs are turned off.
+	 * @param {number} power
+	 * @return {Subject<any>} client
+	**/
+	setPower( power: boolean ) : Observable<any> {
+		return this.post( 'power', power );
 	}
 
 	private get( operation: String, value: any ) : Observable<any> {

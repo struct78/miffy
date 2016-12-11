@@ -4,11 +4,15 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content padding>
+	<ion-item>
+		<ion-label> Power On</ion-label>
+		<ion-toggle checked="true" [(ngModel)]="on" (ngModelChange)="onPowerChange($event)"></ion-toggle>
+	</ion-item>
 	<ion-item>
 	  <ion-range [(ngModel)]="brightness" (ngModelChange)="onBrightnessChange($event)">
-	    <ion-icon range-left small name="sunny" min="35"></ion-icon>
-	    <ion-icon range-right name="sunny" max="100"></ion-icon>
+	    <ion-icon range-left small name="sunny" min="1"></ion-icon>
+	    <ion-icon range-right name="sunny" max="255"></ion-icon>
 	  </ion-range>
 	</ion-item>
 	<ion-item>

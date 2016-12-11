@@ -1,11 +1,6 @@
-char ssid[] = "Axolotl";      // your network SSID (name) 
-char pass[] = "sZFLMHovpz";   // your network password
-
-//char ssid[] = "Dave's Phone";
-//char pass[] = "Evelyn23";
-
-//char ssid[] = "IE Guest";
-//char pass[] = "triangle";
+// Wi-Fi credentials are stored in a file called "credentials.ino". For the purposes of security this file has been excluded from Github.
+// char ssid[] = "Your Network Name";
+//char pass[] = "Your Network Password";   // your network password
 
 #define PREFIX ""
 WebServer webserver(PREFIX, 80);
@@ -17,45 +12,37 @@ void wifi_setup() {
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {
     Serial.println("WiFi shield not present"); 
-    // don't continue:
     while(true);
   } 
   
   // attempt to connect to Wifi network:
   while ( wifi_status != WL_CONNECTED) { 
     Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
-    wifi_status = WiFi.begin(ssid, pass);
+    Serial.println(ssid);   
+    wifi_status = WiFi.begin(ssid, pass); 
 
-    // wait 10 seconds for connection:
-    delay(10000);
+    delay(5000);
   } 
   
   webserver.setDefaultCommand(&routes_default);
-
-  webserver.addCommand("api/on", &routes_api_on);
-  webserver.addCommand("api/off", &routes_api_off);
   webserver.addCommand("api/status", &routes_api_status);
-  
-  /* start the server to wait for connections */
+  webserver.addCommand("api/power", &routes_api_power);
+  webserver.addCommand("api/speed", &routes_api_speed);
+  webserver.addCommand("api/brightness", &routes_api_brightness);
+  //webserver.addCommand("api/pattern", &routes_api_pattern);
   webserver.begin();
 
-  // you're connected now, so print out the status:
   printWifiStatus();
 }
 
 void printWifiStatus() {
-  // print the SSID of the network you're attached to:
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
 
-  // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
 
-  // print the received signal strength:
   long rssi = WiFi.RSSI();
   Serial.print("signal strength (RSSI):");
   Serial.print(rssi);
@@ -63,11 +50,9 @@ void printWifiStatus() {
 }
 
 void wifi_loop() {
-  // listen for incoming clients
   char buff[64];
   int len = 64;
 
-  /* process incoming connections one at a time forever */
   webserver.processConnection(buff, &len);
 }
 

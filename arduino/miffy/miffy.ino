@@ -5,11 +5,11 @@
 void setup() {
   Serial.begin(115200); 
   neomatrix_setup();
-  //wifi_setup();
+  wifi_setup();
 }
 
 void loop() {
-  //wifi_loop();
+  wifi_loop();
   neomatrix_loop();
 }
 
