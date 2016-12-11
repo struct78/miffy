@@ -37,6 +37,7 @@ node_modules
 www
 .idea
 .temp
+.tmp
 .sass-cache
 bower_components
 coverage
