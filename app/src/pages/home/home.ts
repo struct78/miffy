@@ -9,26 +9,19 @@ import 'rxjs/add/operator/distinctUntilChanged';
   templateUrl: 'home.html'
 })
 export class HomePage {
+	private power : boolean;
+	private brightness : number;
+	private speed: number;
 
-  constructor( public navCtrl: NavController, private arduino: ArduinoService ) {
-
-  }
-
-	onPan( e ) {
-		console.log( e );
-	}
-
-	onRelease( e ) {
-		console.log( e );
-	}
+  constructor( public navCtrl: NavController, private arduino: ArduinoService ) { }
 
 	onPowerChange( power : boolean ) {
-		console.log( status );
 		this.arduino
 			.setPower( power )
 			.subscribe( ( data ) => {
 				console.log( data );
-			});
+			})
+			.unsubscribe();
 	}
 
 	onBrightnessChange( brightness : number ) {
@@ -36,7 +29,8 @@ export class HomePage {
 			.setBrightness( brightness )
 			.subscribe( ( data ) => {
 				console.log(data);
-			});
+			})
+			.unsubscribe();
 	}
 
 	onSpeedChange( speed : number ) {
@@ -44,10 +38,27 @@ export class HomePage {
 			.setSpeed( speed )
 			.subscribe( ( data ) => {
 				console.log(data);
-			});
+			})
+			.unsubscribe();
+	}
+
+	onPatternChange( pattern: number ) {
+		this.arduino
+			.setPattern( pattern )
+			.subscribe( ( data ) => {
+				console.log(data);
+			})
+			.unsubscribe();
 	}
 
 	ngOnInit() {
-		this.arduino.getStatus();
+		this.arduino
+			.getStatus()
+			.subscribe( ( data ) => {
+				console.log( data );
+				this.power = data.power;
+				this.brightness = data.brightness;
+				this.speed = data.speed;
+			});
 	}
 }
