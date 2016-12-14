@@ -8,19 +8,35 @@ Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(cols, rows, pin, NEO_MATRIX_TOP +
 void neomatrix_setup() {
   matrix.begin();
   matrix.setBrightness( get_neomatrix_brightness() );
-  matrix.fillScreen( matrix.Color( 255, 255, 255 ) );
+  matrix.fillScreen( matrix.Color( 50, 50, 255 ) );
   matrix.show();
 }
 
+/**
+ * @name set_neomatrix_power
+ * @description Sets the power on or off. True = on. False = off.
+ * @param {bool} power
+ * @return {void}
+**/
 void set_neomatrix_power( bool power ) {
   power = power;
 }
 
-
+/**
+ * @name get_neomatrix_power
+ * @description Returns the current power state.
+ * @return {bool}
+**/
 bool get_neomatrix_power() {
   return power;
 }
 
+/**
+ * @name set_neomatrix_speed
+ * @description Sets the speed of the colour cycle.
+ * @param {bool} theta - A number between 1 and 100
+ * @return {bool}
+**/
 void set_neomatrix_speed( float t ) {
   theta = (float) constrain(t, 1, 100) / 100;
 }
@@ -35,6 +51,14 @@ void set_neomatrix_brightness( int t ) {
 
 uint8_t get_neomatrix_brightness() {
   return (int) brightness;
+}
+
+void set_neomatrix_pattern( int p ) {
+  pattern = (Pattern)constrain( p, 1, PATTERNMAX );
+}
+
+int get_neomatrix_pattern() {
+  return (int)pattern;
 }
 
 void neomatrix_loop() {

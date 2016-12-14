@@ -87,6 +87,23 @@ void routes_api_power( WebServer &server, WebServer::ConnectionType type, char *
   }
 }
 
+
+
+void routes_api_pattern( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
+  if (type == WebServer::POST)
+  {
+    set_neomatrix_pattern( param_int( server, "pattern" ) );
+
+    server.httpSuccess("application/json");
+    server.print("{ \"result\": \"");
+    server.print( (int)get_neomatrix_pattern() );
+    server.print("\" }");
+  } else {
+    server.httpFail();
+    server.print("{ \"error\": \"Method not allowed\" }");
+  }
+}
+
 int param_int( WebServer server, const char *key ) {
   int returnValue = 0;
   bool repeat;
@@ -123,4 +140,3 @@ int param_bool( WebServer server, const char *key ) {
 
   return returnValue;
 }
-
