@@ -18,11 +18,12 @@ export class ArduinoService {
 	private debounceTime = 500;
 
 	constructor( private http : Http, private storage: Storage ) {
+		this.storage.clear();
 		this.saveDefault( 'speed' , 0.01 );
 		this.saveDefault( 'pattern' , Patterns.WIPE );
 		this.saveDefault( 'on', false );
 		this.saveDefault( 'brightness', 128 );
-		this.saveDefault( 'api_url', 'http://192.168.0.22/api' );
+		this.saveDefault( 'api_url', 'http://miffylamp.dynu.net/api' );
 		this.createFactory();
 	}
 
@@ -41,8 +42,8 @@ export class ArduinoService {
 
 				// HTTP POST
 				if ( options.method === 'POST' ) {
-					let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
-					let requestOptions = new RequestOptions({ headers: headers });
+					let headers = new Headers( { 'Content-Type': 'application/x-www-form-urlencoded' } );
+					let requestOptions = new RequestOptions( { headers: headers } );
 					let body = new URLSearchParams();
 					body.set( options.key || options.operation , options.value );
 
@@ -50,7 +51,9 @@ export class ArduinoService {
 						.flatMap( ( url ) => {
 							return this.http.post( url.concat( '/', options.operation ), body, requestOptions )
 								.map( ( response:Response ) => {
-									this.savePreference( options.key || options.operation, options.value );
+									if ( options.save ) {
+										return this.saveResponse( options.key || options.operation, options.value );
+									}
 									return response.json();
 								} )
 								.catch( this.catchError );
@@ -64,7 +67,10 @@ export class ArduinoService {
 						.flatMap( ( url ) => {
 							return this.http.get( url.concat( '/', options.operation ) )
 								.map( ( response: Response ) => {
-									this.saveResponse( response, options );
+									if ( options.save ) {
+										return this.saveResponse( response, options );
+									}
+									return response.json();
 								})
 								.catch( this.catchError );
 						});
@@ -144,50 +150,45 @@ export class ArduinoService {
 		return this.post( 'power', power );
 	}
 
-	private get( operation: String, value: any ) : Observable<any> {
+
+	/**
+	 * @name setPattern
+	 * @description Toggles the LED algorithm.
+	 * @param {number} pattern
+	 * @return {Subject<any>} client
+	**/
+	setPattern( pattern: number ) : Observable<any> {
+		return this.post( 'pattern', pattern );
+	}
+
+	/**
+	 * @name getStatus
+	 * @description Gets the status of the lamp
+	 * @return {Subject<any>} client
+	**/
+	getStatus() : Observable<any> {
+		return this.get( 'status', false );
+	}
+
+	private get( operation: String, save?: boolean ) : Observable<any> {
 		this.client.next({
 			method: 'GET',
 			operation: operation,
-			value: value
+			save: save
 		});
 
 		return this.client;
 	}
 
-	private post( operation: String, value: any, key?: any ) : Observable<any> {
+	private post( operation: String, value: any, key?: any, save?: boolean ) : Observable<any> {
 		this.client.next({
 			method: 'POST',
 			operation: operation,
 			value: value,
-			key: key
+			key: key,
+			save: save
 		});
 
 		return this.client;
 	}
-
-	getStatus() {
-		console.log(this.storage);
-		/*
-		return this.db.openDatabase({
-			name: "settings.db",
-			location: "default"
-		}).then(() => {
-			return this.database.executeSql("SELECT TOP 1 FROM Settings", []);
-		}).then((data) => {
-			 return this.http.get( "http://192.168.0.22/api/status" ).map( ( response:Response ) => response.json() ) );
-		});*/
-	}
-		/*
-
-	  this.people = [];
-	  if(data.rows.length > 0) {
-	      for(var i = 0; i < data.rows.length; i++) {
-	          this.people.push({firstname: data.rows.item(i).firstname, lastname: data.rows.item(i).lastname});
-	      }
-	  }
-	}, (error) => {
-	  console.log("ERROR: " + JSON.stringify(error));
-	});
-		return this.http.get( this.url ).map( ( response:Response ) => response.json().products.find( ( product, i ) => product.url == url ) );
-	}*/
 }
