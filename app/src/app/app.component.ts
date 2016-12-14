@@ -8,7 +8,7 @@ import { HomePage } from '../pages/home/home';
 })
 export class Miffy {
   rootPage = HomePage;
-  constructor(platform: Platform) {
+  constructor( platform: Platform ) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
