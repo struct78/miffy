@@ -4,10 +4,10 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content padding="20">
 	<ion-item>
 		<ion-label> Power On</ion-label>
-		<ion-toggle checked="true" [(ngModel)]="on" (ngModelChange)="onPowerChange($event)"></ion-toggle>
+		<ion-toggle checked="true" [(ngModel)]="on" (ngModelChange)="onPowerChange($event)" ngDefaultControl></ion-toggle>
 	</ion-item>
 	<ion-item>
 	  <ion-range [(ngModel)]="brightness" (ngModelChange)="onBrightnessChange($event)">
@@ -21,4 +21,21 @@
 	    <ion-icon range-right name="speedometer"></ion-icon>
 	  </ion-range>
 	</ion-item>
+	<ion-list radio-group [(ngModel)]="pattern" (ngModelChange)="onPatternChange($event)">
+	  <ion-list-header>
+	    Pattern
+	  </ion-list-header>
+	  <ion-item>
+	    <ion-label>Radial</ion-label>
+	    <ion-radio checked="true" text="RADIAL" value="0"></ion-radio>
+	  </ion-item>
+	  <ion-item>
+	    <ion-label>Wipe</ion-label>
+	    <ion-radio text="WIPE" value="1"></ion-radio>
+	  </ion-item>
+	  <ion-item>
+	    <ion-label>Pulse</ion-label>
+	    <ion-radio text="PULSE" value="2"></ion-radio>
+	  </ion-item>
+	</ion-list>
 </ion-content>
