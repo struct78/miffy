@@ -12,6 +12,7 @@ export class HomePage {
 	private power : boolean;
 	private brightness : number;
 	private speed: number;
+	private contrast: number;
 
   constructor( public navCtrl: NavController, private arduino: ArduinoService ) { }
 
@@ -27,6 +28,15 @@ export class HomePage {
 	onBrightnessChange( brightness : number ) {
 		this.arduino
 			.setBrightness( brightness )
+			.subscribe( ( data ) => {
+				console.log(data);
+			})
+			.unsubscribe();
+	}
+
+	onContrastChange( contrast : number ) {
+		this.arduino
+			.setContrast( contrast )
 			.subscribe( ( data ) => {
 				console.log(data);
 			})
@@ -59,6 +69,7 @@ export class HomePage {
 				this.power = data.power;
 				this.brightness = data.brightness;
 				this.speed = data.speed;
+				this.contrast = data.contrast;
 			});
 	}
 }

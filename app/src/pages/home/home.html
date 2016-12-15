@@ -16,6 +16,12 @@
 	  </ion-range>
 	</ion-item>
 	<ion-item>
+	  <ion-range [(ngModel)]="contrast" (ngModelChange)="onContrastChange($event)">
+	    <ion-icon range-left small name="contrast" min="1"></ion-icon>
+	    <ion-icon range-right name="contrast" max="255"></ion-icon>
+	  </ion-range>
+	</ion-item>
+	<ion-item>
 	  <ion-range [(ngModel)]="speed" (ngModelChange)="onSpeedChange($event)">
 	    <ion-icon range-left small name="speedometer"></ion-icon>
 	    <ion-icon range-right name="speedometer"></ion-icon>

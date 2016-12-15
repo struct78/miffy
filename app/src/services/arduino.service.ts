@@ -131,6 +131,16 @@ export class ArduinoService {
 	}
 
 	/**
+	 * @name setContrast
+	 * @description Sets the contrast of the LEDS. Range 1 - 10. 10 being high contrast.
+	 * @param {number} contrast
+	 * @return {Subject<any>} client
+	**/
+	setContrast( contrast: number ) : Observable<any> {
+		return this.post( 'contrast', contrast );
+	}
+
+	/**
 	 * @name setSpeed
 	 * @description Sets the speed of the colour cycle. Range 1 - 100. 1 being the slowest.
 	 * @param {number} speed
