@@ -1,10 +1,14 @@
 WiFiClient client;
 IPAddress ip;
 
-long lastDnsUpdate = 0;
-long interval = 1000000;
 bool dns_finished = false;
 
+/**
+ * @name wifi_setup
+ * @description Connects to the Wi-Fi and sets up API routes.
+ * @param {IPAddress} addr - The local IP address.
+ * @return {void}
+**/
 void update_dns( IPAddress addr ) {
 	ip = addr;
 	dns_finished = false;
@@ -26,23 +30,25 @@ void update_dns( IPAddress addr ) {
 	}
 }
 
-
+/**
+ * @name dns_loop
+ * @description Updates the dynamic DNS again.
+ * @return {void}
+**/
 void dns_loop() {
 	if ( !dns_finished ) {
-		while (client.available()) {
+		while ( client.available() ) {
 			char c = client.read();
 		}
 
 		// if the server's disconnected, stop the client:
-		if (!client.connected()) {
+		if ( !client.connected() ) {
 			client.stop();
 			dns_finished = true;
 		}
 	}
 
-	unsigned long current = millis();
-	if ( current - lastDnsUpdate > interval) {
-		lastDnsUpdate = current;
+	if ( millis() % 60000 == 0 ) {
 		update_dns( ip );
 	}
 }
