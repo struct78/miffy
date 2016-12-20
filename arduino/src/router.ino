@@ -33,6 +33,7 @@ void routes_default( WebServer &server, WebServer::ConnectionType type, char *ur
  * @return {void}
 **/
 void routes_api_status( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
+	Serial.println("/api/status");
 	server.httpSuccess("application/json");
 
 	if (type == WebServer::GET)
@@ -66,7 +67,7 @@ void routes_api_status( WebServer &server, WebServer::ConnectionType type, char 
  * @return {void}
 **/
 void routes_api_speed( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
-	int speed = theta;
+	Serial.println("/api/speed");
 
 	if (type == WebServer::POST)
 	{
@@ -93,6 +94,8 @@ void routes_api_speed( WebServer &server, WebServer::ConnectionType type, char *
  * @return {void}
 **/
 void routes_api_brightness( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
+	Serial.println("/api/brightness");
+
 	if (type == WebServer::POST)
 	{
 		set_neomatrix_brightness( param_int( server, "brightness" ) );
@@ -120,6 +123,8 @@ void routes_api_brightness( WebServer &server, WebServer::ConnectionType type, c
  * @return {void}
 **/
 void routes_api_contrast( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
+	Serial.println("/api/contrast");
+
 	if (type == WebServer::POST)
 	{
 		set_neomatrix_contrast( param_int( server, "contrast" ) );
@@ -145,6 +150,8 @@ void routes_api_contrast( WebServer &server, WebServer::ConnectionType type, cha
  * @return {void}
 **/
 void routes_api_power( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
+	Serial.println("/api/power");
+
 	if (type == WebServer::POST)
 	{
 		set_neomatrix_power( param_bool( server, "power" ) );
@@ -170,6 +177,8 @@ void routes_api_power( WebServer &server, WebServer::ConnectionType type, char *
  * @return {void}
 **/
 void routes_api_pattern( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
+	Serial.println("/api/pattern");
+
 	if (type == WebServer::POST)
 	{
 		set_neomatrix_pattern( param_int( server, "pattern" ) );
@@ -184,6 +193,14 @@ void routes_api_pattern( WebServer &server, WebServer::ConnectionType type, char
 	}
 }
 
+/**
+ * @name param_int
+ * @description Converts a form parameter to an integer.
+ * @methods POST
+ * @param {WebServer} server - Pointer to the webserver object in {wifi.info}.
+ * @param {char*} key - The key of the form parameter to look for.
+ * @return {void}
+**/
 int param_int( WebServer server, const char *key ) {
 	int returnValue = 0;
 	bool repeat;
@@ -202,8 +219,15 @@ int param_int( WebServer server, const char *key ) {
 	return returnValue;
 }
 
-
-int param_bool( WebServer server, const char *key ) {
+/**
+ * @name param_bool
+ * @description Converts a form parameter to a boolean.
+ * @methods POST
+ * @param {WebServer} server - Pointer to the webserver object in {wifi.info}.
+ * @param {char*} key - The key of the form parameter to look for.
+ * @return {bool}
+**/
+bool param_bool( WebServer server, const char *key ) {
 	bool returnValue = false;
 	bool repeat;
 	char name[16], value[16];
@@ -213,7 +237,9 @@ int param_bool( WebServer server, const char *key ) {
 		repeat = server.readPOSTparam(name, 16, value, 16);
 		if (strcmp(name, key) == 0)
 		{
-			returnValue = (bool)value;
+			if ( value == "true" ) {
+				returnValue = true;
+			}
 		}
 
 	} while (repeat);
