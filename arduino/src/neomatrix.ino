@@ -8,7 +8,7 @@ Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(cols, rows, pin, NEO_MATRIX_TOP +
 void neomatrix_setup() {
 	matrix.begin();
 	matrix.setBrightness( get_neomatrix_brightness() );
-	matrix.fillScreen( matrix.Color( 50, 50, 255 ) );
+	matrix.fillScreen( matrix.Color( 255, 50, 255 ) );
 	matrix.show();
 }
 
@@ -18,8 +18,8 @@ void neomatrix_setup() {
  * @param {bool} power
  * @return {void}
 **/
-void set_neomatrix_power( bool power ) {
-	power = power;
+void set_neomatrix_power( bool p ) {
+	power = p;
 }
 
 /**
@@ -136,8 +136,10 @@ uint16_t hsl_to_rgb( float h, float s, float l ) {
 		float r, g, b;
 
 		if ( s == 0.0 ) {
-				r = g = b = l; // achromatic
+			// No saturation, so it's grey
+			r = g = b = l;
 		} else {
+				// If the lightness is less than 0.5, then multiply by 1+saturation, otherwise add the saturation and subtract lightness multipled by saturation.
 				float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
 				float p = 2.0 * l - q;
 				r = hue_to_rgb(p, q, h + 1/3.0);
@@ -145,6 +147,7 @@ uint16_t hsl_to_rgb( float h, float s, float l ) {
 				b = hue_to_rgb(p, q, h - 1/3.0);
 		}
 
+		// Return a neomatrix colour
 		return matrix.Color( round(r * 255), round(g * 255), round(b * 255) );
 }
 
@@ -154,7 +157,7 @@ uint16_t hsl_to_rgb( float h, float s, float l ) {
  * @return {void}
 **/
 void neomatrix_loop() {
-	uint16_t x, y, z;
+	uint8_t x, y, z;
 	float hue = 0.0;
 
 	if ( get_neomatrix_power() ) {
