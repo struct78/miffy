@@ -15,6 +15,7 @@ export enum Patterns {
 @Injectable()
 export class ArduinoService {
 	private client: Subject<any> = new Subject<any>();
+	private api_url: string = "http://miffylamp.dynu.net/api";
 	private debounceTime = 500;
 
 	constructor( private http : Http, private storage: Storage ) {
@@ -23,7 +24,6 @@ export class ArduinoService {
 		this.saveDefault( 'pattern' , Patterns.WIPE );
 		this.saveDefault( 'on', false );
 		this.saveDefault( 'brightness', 128 );
-		this.saveDefault( 'api_url', 'http://miffylamp.dynu.net/api' );
 		this.createFactory();
 	}
 
@@ -39,7 +39,6 @@ export class ArduinoService {
 			.map( ( v ) => { return v; } )
 			.debounceTime( this.debounceTime )
 			.switchMap( ( options:any ):any => {
-
 				// HTTP POST
 				if ( options.method === 'POST' ) {
 					let headers = new Headers( { 'Content-Type': 'application/x-www-form-urlencoded' } );
@@ -47,33 +46,26 @@ export class ArduinoService {
 					let body = new URLSearchParams();
 					body.set( options.key || options.operation , options.value );
 
-					return Observable.fromPromise( this.storage.get( 'api_url' ) )
-						.flatMap( ( url ) => {
-							return this.http.post( url.concat( '/', options.operation ), body, requestOptions )
-								.map( ( response:Response ) => {
-									if ( options.save ) {
-										return this.saveResponse( options.key || options.operation, options.value );
-									}
-									return response.json();
-								} )
-								.catch( this.catchError );
-						});
+					return this.http.post( this.api_url.concat( '/', options.operation ), body, requestOptions )
+						.map( ( response:Response ) => {
+							if ( options.save ) {
+								return this.saveResponse( options.key || options.operation, options.value );
+							}
+							return response.json();
+						} )
+						.catch( this.catchError );
 				}
-
 
 				// HTTP GET
 				if ( options.method === 'GET' ) {
-					return Observable.fromPromise( this.storage.get( 'api_url' ) )
-						.flatMap( ( url ) => {
-							return this.http.get( url.concat( '/', options.operation ) )
-								.map( ( response: Response ) => {
-									if ( options.save ) {
-										return this.saveResponse( response, options );
-									}
-									return response.json();
-								})
-								.catch( this.catchError );
-						});
+					return this.http.get( this.api_url.concat( '/', options.operation ) )
+						.map( ( response: Response ) => {
+							if ( options.save ) {
+								return this.saveResponse( response, options );
+							}
+							return response.json();
+						})
+						.catch( this.catchError );
 				}
 			})
 			.share()
