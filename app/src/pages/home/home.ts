@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, Loading, LoadingController } from 'ionic-angular';
 import { ArduinoService } from '../../services/arduino.service';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -13,8 +13,10 @@ export class HomePage {
 	private brightness : number;
 	private speed: number;
 	private contrast: number;
+	private loader: Loading;
 
-  constructor( public navCtrl: NavController, private arduino: ArduinoService ) { }
+	constructor( public navCtrl: NavController, private arduino: ArduinoService, public loadingController: LoadingController ) {
+	}
 
 	onPowerChange( power : boolean ) {
 		this.arduino
@@ -62,10 +64,15 @@ export class HomePage {
 	}
 
 	ngOnInit() {
+		this.loader = this.loadingController.create({
+			content: "Loading Lamp..."
+		});
+		this.loader.present();
+
 		this.arduino
 			.getStatus()
 			.subscribe( ( data ) => {
-				console.log( data );
+				this.loader.dismiss();
 				this.power = data.power;
 				this.brightness = data.brightness;
 				this.speed = data.speed;
