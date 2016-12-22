@@ -3,6 +3,7 @@ import { NavController, Loading, LoadingController } from 'ionic-angular';
 import { ArduinoService } from '../../services/arduino.service';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
+import { Observable } from "rxjs/Observable";
 
 @Component({
   selector: 'page-home',
@@ -13,18 +14,19 @@ export class HomePage {
 	private brightness : number;
 	private speed: number;
 	private contrast: number;
+	private pattern: number;
 	private loader: Loading;
 
-	constructor( public navCtrl: NavController, private arduino: ArduinoService, public loadingController: LoadingController ) {
-	}
+	constructor( public navCtrl: NavController, private arduino: ArduinoService, public loadingController: LoadingController ) { }
 
 	onPowerChange( power : boolean ) {
 		this.arduino
 			.setPower( power )
 			.subscribe( ( data ) => {
 				console.log( data );
-			})
-			.unsubscribe();
+			}, ( ex ) => {
+				console.log( ex );
+			} );
 	}
 
 	onBrightnessChange( brightness : number ) {
@@ -32,8 +34,9 @@ export class HomePage {
 			.setBrightness( brightness )
 			.subscribe( ( data ) => {
 				console.log(data);
-			})
-			.unsubscribe();
+			}, ( ex ) => {
+				console.log( ex );
+			} );
 	}
 
 	onContrastChange( contrast : number ) {
@@ -41,8 +44,9 @@ export class HomePage {
 			.setContrast( contrast )
 			.subscribe( ( data ) => {
 				console.log(data);
-			})
-			.unsubscribe();
+			}, ( ex ) => {
+				console.log( ex );
+			} );
 	}
 
 	onSpeedChange( speed : number ) {
@@ -50,8 +54,9 @@ export class HomePage {
 			.setSpeed( speed )
 			.subscribe( ( data ) => {
 				console.log(data);
-			})
-			.unsubscribe();
+			}, ( ex ) => {
+				console.log( ex );
+			} );
 	}
 
 	onPatternChange( pattern: number ) {
@@ -59,24 +64,36 @@ export class HomePage {
 			.setPattern( pattern )
 			.subscribe( ( data ) => {
 				console.log(data);
-			})
-			.unsubscribe();
+			}, ( ex ) => {
+				console.log( ex );
+			} );
 	}
 
-	ngOnInit() {
-		this.loader = this.loadingController.create({
-			content: "Loading Lamp..."
-		});
-		this.loader.present();
+	getStatus() {
+		// This code block had to be moved to ngAfterViewInit() because it simply refused to work properly when
+		// it was in ngOnInit(). It would work in ngOnInit() if I called it twice (???);
 
 		this.arduino
 			.getStatus()
 			.subscribe( ( data ) => {
 				this.loader.dismiss();
-				this.power = data.power;
-				this.brightness = data.brightness;
-				this.speed = data.speed;
-				this.contrast = data.contrast;
-			});
+				this.power = data.result.power;
+				this.brightness = data.result.brightness;
+				this.speed = data.result.speed;
+				this.contrast = data.result.contrast;
+				this.pattern = data.result.pattern;
+
+				console.log( data );
+			}, ( error ) => {
+				console.log(error);
+			} );
+	}
+
+	ngOnInit() {
+		this.loader = this.loadingController.create({
+			content: "Finding Miffy..."
+		});
+		this.loader.present();
+		this.getStatus();
 	}
 }
