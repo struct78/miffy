@@ -38,7 +38,8 @@ void routes_api_status( WebServer &server, WebServer::ConnectionType type, char 
 
 	if (type == WebServer::GET)
 	{
-		server.print("{ \"power\": ");
+		server.print("{ \"result\": {");
+		server.print("\"power\": ");
 		server.print( get_neomatrix_power() );
 		server.print(",");
 		server.print("\"speed\": ");
@@ -49,6 +50,7 @@ void routes_api_status( WebServer &server, WebServer::ConnectionType type, char 
 		server.print(",");
 		server.print("\"contrast\": ");
 		server.print( get_neomatrix_contrast() );
+		server.print("}");
 		server.print("}");
 	} else {
 		server.httpFail();
