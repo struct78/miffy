@@ -5,9 +5,9 @@ import { Observable } from "rxjs/Observable";
 import 'rxjs/Rx';
 
 export enum Patterns {
-		WIPE = 0,
-		RADIAL = 1,
-		PULSE = 2
+	WIPE = 0,
+	RADIAL = 1,
+	PULSE = 2
 };
 
 @Injectable()
@@ -92,7 +92,7 @@ export class ArduinoService {
 	getStatus() : Observable<any> {
 		return this.get( 'status' );
 	}
-	
+
 
 	private get( operation: string ) : Observable<any> {
 		return this.http.get( this.api_url.concat( '/', operation ) )
