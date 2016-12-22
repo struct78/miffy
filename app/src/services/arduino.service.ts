@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from "rxjs/Observable";
-import { SQLite} from 'ionic-native';
-import { Storage } from '@ionic/storage';
 import 'rxjs/Rx';
 
 export enum Patterns {
@@ -15,67 +13,11 @@ export enum Patterns {
 @Injectable()
 export class ArduinoService {
 	private client: Subject<any> = new Subject<any>();
-	private api_url: string = "http://miffylamp.dynu.net/api";
-	private debounceTime = 500;
+	private response: Observable<any>;
+	//private api_url: string = "http://miffylamp.dynu.net/api";
+	private api_url: string = "http://miffy.getsandbox.com";
 
-	constructor( private http : Http, private storage: Storage ) {
-		this.storage.clear();
-		this.saveDefault( 'speed' , 0.01 );
-		this.saveDefault( 'pattern' , Patterns.WIPE );
-		this.saveDefault( 'on', false );
-		this.saveDefault( 'brightness', 128 );
-		this.createFactory();
-	}
-
-	/**
-	 * @name createFactory
-	 * @description
-	 * Due to the Arduino and the Webduino only being able to handle less than 3 or 4 requests a second
-	 * we create a factory for the HTTP client, which as a subject can cancel previous requests when
-	 * new ones are made, and each request is debounced so as not to overload the Arduino.
-	**/
-	private createFactory() {
-		this.client
-			.map( ( v ) => { return v; } )
-			.debounceTime( this.debounceTime )
-			.switchMap( ( options:any ):any => {
-				// HTTP POST
-				if ( options.method === 'POST' ) {
-					let headers = new Headers( { 'Content-Type': 'application/x-www-form-urlencoded' } );
-					let requestOptions = new RequestOptions( { headers: headers } );
-					let body = new URLSearchParams();
-					body.set( options.key || options.operation , options.value );
-
-					return this.http.post( this.api_url.concat( '/', options.operation ), body, requestOptions )
-						.map( ( response:Response ) => {
-							if ( options.save ) {
-								return this.saveResponse( options.key || options.operation, options.value );
-							}
-							return response.json();
-						} )
-						.catch( this.catchError );
-				}
-
-				// HTTP GET
-				if ( options.method === 'GET' ) {
-					return this.http.get( this.api_url.concat( '/', options.operation ) )
-						.map( ( response: Response ) => {
-							if ( options.save ) {
-								return this.saveResponse( response, options );
-							}
-							return response.json();
-						})
-						.catch( this.catchError );
-				}
-			})
-			.share()
-			.subscribe();
-	}
-
-	private saveResponse( response : Response, options : any ) {
-		this.savePreference( options.key || options.operation, options.value );
-		return response.json();
-	}
+	constructor( private http : Http ) { }
 
 	private catchError( ex: Response | any ) : Observable<any> {
 			let message: string;
@@ -89,27 +31,6 @@ export class ArduinoService {
 			}
 
 			return Observable.throw( message );
-	}
-	/**
-	 * @name savePreference
-	 * @description
-	 * Adds default properties to the storage object if they don't exist.
-	**/
-	private savePreference( key: any, val: any ) {
-		this.storage.set( key, val );
-	}
-
-	/**
-	 * @name saveDefault
-	 * @description
-	 * Adds default properties to the storage object if they don't exist.
-	**/
-	private saveDefault( key: any, val: any ) {
-		this.storage.get( key ).then( ( data ) => {
-			if ( !data ) {
-				this.storage.set( key, val );
-			}
-		});
 	}
 
 	/**
@@ -169,28 +90,26 @@ export class ArduinoService {
 	 * @return {Subject<any>} client
 	**/
 	getStatus() : Observable<any> {
-		return this.get( 'status', false );
+		return this.get( 'status' );
+	}
+	
+
+	private get( operation: string ) : Observable<any> {
+		return this.http.get( this.api_url.concat( '/', operation ) )
+			.retryWhen( ( ex ) => ex.delay(500) )
+			.map( ( response: Response ) => response.json() )
+			.catch( this.catchError );
 	}
 
-	private get( operation: String, save?: boolean ) : Observable<any> {
-		this.client.next({
-			method: 'GET',
-			operation: operation,
-			save: save
-		});
+	private post( operation: string, value: any, key?: any ) : Observable<any> {
+		let headers = new Headers( { 'Content-Type': 'application/x-www-form-urlencoded' } );
+		let requestOptions = new RequestOptions( { headers: headers } );
+		let body = new URLSearchParams();
+		body.set( key || operation , value );
 
-		return this.client;
-	}
-
-	private post( operation: String, value: any, key?: any, save?: boolean ) : Observable<any> {
-		this.client.next({
-			method: 'POST',
-			operation: operation,
-			value: value,
-			key: key,
-			save: save
-		});
-
-		return this.client;
+		return this.http.post( this.api_url.concat( '/', operation ), body, requestOptions )
+			.retryWhen( ( ex ) => ex.delay(500) )
+			.map( ( response:Response ) =>  response.json() )
+			.catch( this.catchError );
 	}
 }
