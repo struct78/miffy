@@ -76,7 +76,7 @@ int get_neomatrix_brightness() {
  * @return {void}
 **/
 void set_neomatrix_contrast( int t ) {
-	brightness = constrain(t, 1, 10);
+	contrast = constrain(t, 1, 10);
 }
 
 /**
@@ -104,7 +104,7 @@ void set_neomatrix_pattern( int p ) {
  * @return {int}
 **/
 int get_neomatrix_pattern() {
-	return (int)pattern;
+	return (int) pattern;
 }
 
 /**
@@ -170,7 +170,7 @@ void neomatrix_loop() {
 				//z = ((rows*cols)>>1) + ( q%2 == 0 ? q/2 : -(q/2+1));
 
 				// matrix.drawPixel( z / rows , z % rows, neomatrix_wheel((( q * 256 / 294) + iteration) & 255)); // This one is fine - but goes outside in
-			 // matrix.drawPixel( z / rows , z % rows, neomatrix_wheel ( ((z / rows) + iteration) & 255)); // This one goes left to right in a wave
+			 //  // This one goes left to right in a wave
 
 				//matrix.drawPixel( z / rows, z % rows, neomatrix_wheel ( ( q + iteration) & 255) );
 				//matrix.drawPixel( z / rows, z % rows, HSLtoRGB( (float)((iteration - x) % 360) / 360, 1.0, 0.5 )); //This one animates lengthwise
@@ -183,12 +183,22 @@ void neomatrix_loop() {
 						hue = (float)(int((delta - distance) * contrast) % 360) / 360;
 						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ) );
 						break;
+					case WIPE:
+						hue = (float)(int((z / rows) + delta) % 360) / 360;
+						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ));
+						break;
+					case PULSE:
+						hue = (float)(int((delta - distance) * contrast) % 360) / 360;
+						matrix.drawPixel( x, y, hsl_to_rgb( hue, abs(sin(delta)), 0.5 ) );
 					default:
 						break;
 				}
 			}
 		}
-
-		matrix.show();
 	}
+	else {
+		matrix.fillScreen(0);
+	}
+
+	matrix.show();
 }
