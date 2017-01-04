@@ -14,24 +14,10 @@ export enum Patterns {
 export class ArduinoService {
 	private client: Subject<any> = new Subject<any>();
 	private response: Observable<any>;
-	//private api_url: string = "http://miffylamp.dynu.net/api";
-	private api_url: string = "http://miffy.getsandbox.com";
+	private api_url: string = "http://miffylamp.dynu.net/api";
+	//private api_url: string = "http://miffy.getsandbox.com";
 
 	constructor( private http : Http ) { }
-
-	private catchError( ex: Response | any ) : Observable<any> {
-			let message: string;
-
-			if ( ex instanceof Response ) {
-				const body = ex.json() || '';
-				const err = body.error || JSON.stringify(body);
-				message = `${ex.status} - ${ex.statusText || ''} ${err}`;
-			} else {
-				message = ex.message ? ex.message : ex.toString();
-			}
-
-			return Observable.throw( message );
-	}
 
 	/**
 	 * @name setBrightness
@@ -93,12 +79,10 @@ export class ArduinoService {
 		return this.get( 'status' );
 	}
 
-
 	private get( operation: string ) : Observable<any> {
 		return this.http.get( this.api_url.concat( '/', operation ) )
-			.retryWhen( ( ex ) => ex.delay(500) )
 			.map( ( response: Response ) => response.json() )
-			.catch( this.catchError );
+			.catch( ( response: Response ) => this.handleError( response ) );
 	}
 
 	private post( operation: string, value: any, key?: any ) : Observable<any> {
@@ -108,8 +92,23 @@ export class ArduinoService {
 		body.set( key || operation , value );
 
 		return this.http.post( this.api_url.concat( '/', operation ), body, requestOptions )
-			.retryWhen( ( ex ) => ex.delay(500) )
 			.map( ( response:Response ) =>  response.json() )
-			.catch( this.catchError );
+			.catch( ( response: Response ) => this.handleError( response ) );
+	}
+
+	private handleError( ex: Response | any ) : Observable<any> {
+		if ( ex instanceof Response ) {
+			const body = ex.json() || '';
+			const err = body.error || JSON.stringify(body);
+			console.log(ex.json());
+			return Observable.throw( err );
+		} else {
+			return Observable.throw({
+				status: "error",
+				error: {
+					message: ex.message ? ex.message : ex.toString()
+				}
+			});
+		}
 	}
 }
