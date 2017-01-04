@@ -11,14 +11,18 @@ int wifi_status = WL_IDLE_STATUS;
 void wifi_setup() {
 	// Check for the presence of the shield:
 	if ( WiFi.status() == WL_NO_SHIELD ) {
-		Serial.println("WiFi shield not present");
+		#if defined( DEVELOPMENT )
+		Serial.println( F("WiFi shield not present") );
+		#endif
 		while(true);
 	}
 
 	// Attempt to connect to Wifi network:
 	while ( wifi_status != WL_CONNECTED ) {
+		#if defined( DEVELOPMENT )
 		Serial.print("Attempting to connect to SSID: ");
 		Serial.println(ssid);
+		#endif
 		wifi_status = WiFi.begin(ssid, pass);
 		delay(5000);
 	}
@@ -35,9 +39,10 @@ void wifi_setup() {
 
 	// The local IP address
 	IPAddress ip = WiFi.localIP();
-	Serial.print("IP Address: ");
-	Serial.println(ip);
-
+	#if defined( DEVELOPMENT )
+	Serial.print( F("IP Address: ") );
+	Serial.println( ip );
+	#endif
 	// Update the dynamic DNS
 	update_dns( ip );
 }

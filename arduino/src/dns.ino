@@ -13,7 +13,9 @@ void update_dns( IPAddress addr ) {
 	ip = addr;
 	dns_finished = false;
 	if (client.connect("api.dynu.com", 80)) {
-		Serial.println("Updating DNS");
+		#if defined( DEVELOPMENT )
+		Serial.println( F("Updating DNS") );
+		#endif
 		client.print( "GET /nic/update?hostname=" );
 		client.print( dynamic_hostname );
 		client.print( "&myip=" );
@@ -26,7 +28,9 @@ void update_dns( IPAddress addr ) {
 		client.println( "Connection: close" );
 		client.println();
 	} else {
-		Serial.println("Updating dynamic DNS failed");
+		#if defined( DEVELOPMENT )
+		Serial.println( F("Updating dynamic DNS failed") );
+		#endif
 	}
 }
 

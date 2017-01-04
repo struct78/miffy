@@ -20,6 +20,11 @@ void routes_default( WebServer &server, WebServer::ConnectionType type, char *ur
 		server.httpFail();
 		server.print("{ \"error\": \"Method not allowed\" }");
 	}
+
+	#if defined(DEVELOPMENT)
+	Serial.println( F("/") );
+	Serial.println( freeRam() );
+	#endif
 }
 
 /**
@@ -33,21 +38,19 @@ void routes_default( WebServer &server, WebServer::ConnectionType type, char *ur
  * @return {void}
 **/
 void routes_api_status( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
-	Serial.println("/api/status");
-	server.httpSuccess("application/json");
-
 	if (type == WebServer::GET)
 	{
+		server.httpSuccess("application/json");
 		server.print("{ \"result\": {");
 		server.print("\"power\": ");
-		server.print( get_neomatrix_power() );
-		server.print(",");
+		server.print( get_neomatrix_power() ? "true" : "false" );
+		server.print(", ");
 		server.print("\"speed\": ");
 		server.print( get_neomatrix_speed() );
-		server.print(",");
+		server.print(", ");
 		server.print("\"brightness\": ");
 		server.print( get_neomatrix_brightness() );
-		server.print(",");
+		server.print(", ");
 		server.print("\"contrast\": ");
 		server.print( get_neomatrix_contrast() );
 		server.print("}");
@@ -56,6 +59,11 @@ void routes_api_status( WebServer &server, WebServer::ConnectionType type, char 
 		server.httpFail();
 		server.print("{ \"error\": \"Method not allowed\" }");
 	}
+
+	#if defined(DEVELOPMENT)
+	Serial.println( F("/api/status") );
+	Serial.println( freeRam() );
+	#endif
 }
 
 /**
@@ -69,8 +77,6 @@ void routes_api_status( WebServer &server, WebServer::ConnectionType type, char 
  * @return {void}
 **/
 void routes_api_speed( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
-	Serial.println("/api/speed");
-
 	if (type == WebServer::POST)
 	{
 		set_neomatrix_speed( param_int( server, "speed" ) );
@@ -83,6 +89,11 @@ void routes_api_speed( WebServer &server, WebServer::ConnectionType type, char *
 		server.httpFail();
 		server.print("{ \"error\": \"Method not allowed\" }");
 	}
+
+	#if defined(DEVELOPMENT)
+	Serial.println( F("/api/speed") );
+	Serial.println( freeRam() );
+	#endif
 }
 
 /**
@@ -96,8 +107,6 @@ void routes_api_speed( WebServer &server, WebServer::ConnectionType type, char *
  * @return {void}
 **/
 void routes_api_brightness( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
-	Serial.println("/api/brightness");
-
 	if (type == WebServer::POST)
 	{
 		set_neomatrix_brightness( param_int( server, "brightness" ) );
@@ -110,6 +119,11 @@ void routes_api_brightness( WebServer &server, WebServer::ConnectionType type, c
 		server.httpFail();
 		server.print("{ \"error\": \"Method not allowed\" }");
 	}
+
+	#if defined(DEVELOPMENT)
+	Serial.println( F("/api/brightness") );
+	Serial.println( freeRam() );
+	#endif
 }
 
 
@@ -125,8 +139,6 @@ void routes_api_brightness( WebServer &server, WebServer::ConnectionType type, c
  * @return {void}
 **/
 void routes_api_contrast( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
-	Serial.println("/api/contrast");
-
 	if (type == WebServer::POST)
 	{
 		set_neomatrix_contrast( param_int( server, "contrast" ) );
@@ -139,6 +151,11 @@ void routes_api_contrast( WebServer &server, WebServer::ConnectionType type, cha
 		server.httpFail();
 		server.print("{ \"error\": \"Method not allowed\" }");
 	}
+
+	#if defined(DEVELOPMENT)
+	Serial.println( F("/api/contrast") );
+	Serial.println( freeRam() );
+	#endif
 }
 
 /**
@@ -152,11 +169,10 @@ void routes_api_contrast( WebServer &server, WebServer::ConnectionType type, cha
  * @return {void}
 **/
 void routes_api_power( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
-	Serial.println("/api/power");
-
 	if (type == WebServer::POST)
 	{
-		set_neomatrix_power( param_bool( server, "power" ) );
+		bool result = param_bool( server, "power" );
+		set_neomatrix_power( result );
 
 		server.httpSuccess("application/json");
 		server.print("{ \"result\": ");
@@ -166,6 +182,11 @@ void routes_api_power( WebServer &server, WebServer::ConnectionType type, char *
 		server.httpFail();
 		server.print("{ \"error\": \"Method not allowed\" }");
 	}
+
+	#if defined(DEVELOPMENT)
+	Serial.println( F("/api/power") );
+	Serial.println( freeRam() );
+	#endif
 }
 
 /**
@@ -179,8 +200,6 @@ void routes_api_power( WebServer &server, WebServer::ConnectionType type, char *
  * @return {void}
 **/
 void routes_api_pattern( WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete ) {
-	Serial.println("/api/pattern");
-
 	if (type == WebServer::POST)
 	{
 		set_neomatrix_pattern( param_int( server, "pattern" ) );
@@ -193,6 +212,11 @@ void routes_api_pattern( WebServer &server, WebServer::ConnectionType type, char
 		server.httpFail();
 		server.print("{ \"error\": \"Method not allowed\" }");
 	}
+
+	#if defined(DEVELOPMENT)
+	Serial.println( F("/api/pattern") );
+	Serial.println( freeRam() );
+	#endif
 }
 
 /**
@@ -239,7 +263,10 @@ bool param_bool( WebServer server, const char *key ) {
 		repeat = server.readPOSTparam(name, 16, value, 16);
 		if (strcmp(name, key) == 0)
 		{
-			if ( value == "true" ) {
+			#if defined( DEVELOPMENT )
+			Serial.println( value );
+			#endif
+			if ( strcmp(value, "true") == 0 ) {
 				returnValue = true;
 			}
 		}
@@ -247,4 +274,11 @@ bool param_bool( WebServer server, const char *key ) {
 	} while (repeat);
 
 	return returnValue;
+}
+
+int freeRam ()
+{
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }

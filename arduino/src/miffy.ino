@@ -3,6 +3,8 @@
 #include <WebServer.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_NeoMatrix.h>
+#define DEVELOPMENT 1
+#define WEBDUINO_READ_TIMEOUT_IN_MS 250
 
 void setup() {
 	Serial.begin(115200);
