@@ -3,14 +3,12 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { Miffy } from './app.component';
 import { SettingsPage } from '../pages/settings/settings';
-import { HomePage } from '../pages/home/home';
 import { ArduinoService } from '../services/arduino.service';
 
 @NgModule({
   declarations: [
     Miffy,
-    SettingsPage,
-    HomePage
+    SettingsPage
   ],
   imports: [
     IonicModule.forRoot(Miffy)
@@ -18,8 +16,7 @@ import { ArduinoService } from '../services/arduino.service';
   bootstrap: [IonicApp],
   entryComponents: [
     Miffy,
-    SettingsPage,
-    HomePage
+    SettingsPage
   ],
   providers: [
 		Storage,
