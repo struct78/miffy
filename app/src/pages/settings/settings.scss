@@ -1,3 +1,21 @@
 page-settings {
 
 }
+
+.centered {
+	.scroll-content {
+		display: flex;
+		flex-flow: column;
+		align-content: center;
+		align-items: center;
+
+		>:first-child {
+			display: block;
+			margin-top: auto;
+		}
+
+		>:last-child {
+			margin-bottom: auto;
+		}
+	}
+}
