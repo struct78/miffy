@@ -24,9 +24,12 @@ void update_dns( IPAddress addr ) {
 		client.print( dynamic_hostname_password );
 		client.println( " HTTP/1.1" );
 		client.println( "Host: api.dynu.com" );
-		client.println( "User Agent: Miffy Lamp Arduino/1.0" );
+		client.println( "User Agent: Wi-Fi Nightlight/1.0" );
 		client.println( "Connection: close" );
 		client.println();
+		#if defined( DEVELOPMENT )
+		Serial.println( F("Updated dynamic DNS!") );
+		#endif
 	} else {
 		#if defined( DEVELOPMENT )
 		Serial.println( F("Updating dynamic DNS failed") );

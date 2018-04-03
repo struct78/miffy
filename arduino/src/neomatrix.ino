@@ -1,4 +1,4 @@
-Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(cols, rows, pin, NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_COLUMNS + NEO_MATRIX_PROGRESSIVE, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(rows, cols, pin, NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_COLUMNS + NEO_MATRIX_PROGRESSIVE, NEO_GRB + NEO_KHZ800);
 
 /**
  * @name neomatrix_setup
@@ -34,11 +34,11 @@ bool get_neomatrix_power() {
 /**
  * @name set_neomatrix_speed
  * @description Sets the speed of the colour cycle.
- * @param {float} theta - A number between 1 and 100
+ * @param {float} theta - A number between min_speed and max_speed variables
  * @return {void}
 **/
 void set_neomatrix_speed( float t ) {
-	theta = (float) constrain(t, 1, 100) / 100;
+	theta = (float) constrain(t, min_speed, max_speed) / 100;
 }
 
 /**
@@ -47,17 +47,17 @@ void set_neomatrix_speed( float t ) {
  * @return {int}
 **/
 int get_neomatrix_speed() {
-	return (int) theta * 100;
+	return (int)((float)theta * 100);
 }
 
 /**
  * @name set_neomatrix_brightness
  * @description Sets the brightness of the LEDs.
- * @param {int} t - A number between 1 and 255.
+ * @param {int} t - A number between min_brightness and max_brightness.
  * @return {void}
 **/
 void set_neomatrix_brightness( int t ) {
-	brightness = constrain(t, 1, 255);
+	brightness = constrain(t, min_brightness, max_brightness);
 }
 
 /**
@@ -72,11 +72,11 @@ int get_neomatrix_brightness() {
 /**
  * @name set_neomatrix_brightness
  * @description Sets the contrast of the LEDs.
- * @param {int} t - A number between 1 and 10.
+ * @param {int} t - A number between 1 and 30.
  * @return {void}
 **/
 void set_neomatrix_contrast( int t ) {
-	contrast = constrain(t, 1, 10);
+	contrast = constrain(t, min_contrast, max_contrast);
 }
 
 /**
@@ -91,11 +91,11 @@ int get_neomatrix_contrast() {
 /**
  * @name set_neomatrix_pattern
  * @description Sets the algorithm for the colour cycle.
- * @param {int} t - A number between 1 and PATTERNMAX.
+ * @param {int} t - A number between 1 and RAINBOW_STRIPE.
  * @return {void}
 **/
 void set_neomatrix_pattern( int p ) {
-	pattern = (Pattern)constrain( p, 1, PATTERNMAX-1 );
+	pattern = (Pattern)constrain( p, 0, RAINBOW_STRIPE );
 }
 
 /**
@@ -163,33 +163,33 @@ void neomatrix_loop() {
 	if ( get_neomatrix_power() ) {
 		matrix.setBrightness( get_neomatrix_brightness() );
 
-		delta += theta;
-		for ( x = 0 ; x < cols ; x++ ) {
-			for ( y = 0 ; y < rows ; y++ ) {
-				float distance = dist( (float)cols/2, (float)rows/2, (float)x, (float)y );
-				//z = ((rows*cols)>>1) + ( q%2 == 0 ? q/2 : -(q/2+1));
+    delta += theta;
 
-				// matrix.drawPixel( z / rows , z % rows, neomatrix_wheel((( q * 256 / 294) + iteration) & 255)); // This one is fine - but goes outside in
-			 //  // This one goes left to right in a wave
+		if (delta >= 360) {
+			delta = 0;
+		}
 
-				//matrix.drawPixel( z / rows, z % rows, neomatrix_wheel ( ( q + iteration) & 255) );
-				//matrix.drawPixel( z / rows, z % rows, HSLtoRGB( (float)((iteration - x) % 360) / 360, 1.0, 0.5 )); //This one animates lengthwise
-
-				//matrix.drawPixel( z / rows, z % rows, HSLtoRGB( (float)((iteration - y) % 360) / 360, 1.0, 0.5 ));
-
-				// matrix.drawPixel( x, y, HSLtoRGB( hue, abs(sin(delta)), 0.5 ) ); - Sine wave does flashy flashy
+		for ( x = 0 ; x < rows ; x++ ) {
+			for ( y = 0 ; y < cols ; y++ ) {
+				z = x + y;
+				float distance = dist( (float)rows/2, (float)cols/2, (float)x, (float)y );
 				switch ( pattern ) {
 					case RADIAL:
 						hue = (float)(int((delta - distance) * contrast) % 360) / 360;
 						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ) );
 						break;
 					case WIPE:
-						hue = (float)(int((z / rows) + delta) % 360) / 360;
+						hue = (float)(int((delta + y) * contrast) % 360) / 360;
 						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ));
 						break;
-					case PULSE:
-						hue = (float)(int((delta - distance) * contrast) % 360) / 360;
-						matrix.drawPixel( x, y, hsl_to_rgb( hue, abs(sin(delta)), 0.5 ) );
+					case DIAGONAL_WIPE:
+						hue = (float)(int((delta + z) * contrast) % 360) / 360;
+						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ));
+						break;
+					case RAINBOW_STRIPE:
+						hue = (float)(int(((360 / rows) * x) + delta * contrast) % 360) / 360;
+						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ) );
+						break;
 					default:
 						break;
 				}

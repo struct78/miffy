@@ -20,8 +20,8 @@ void wifi_setup() {
 	// Attempt to connect to Wifi network:
 	while ( wifi_status != WL_CONNECTED ) {
 		#if defined( DEVELOPMENT )
-		Serial.print("Attempting to connect to SSID: ");
-		Serial.println(ssid);
+		Serial.print( F("Attempting to connect to SSID: ") );
+		Serial.println( ssid );
 		#endif
 		wifi_status = WiFi.begin(ssid, pass);
 		delay(5000);
@@ -43,6 +43,7 @@ void wifi_setup() {
 	Serial.print( F("IP Address: ") );
 	Serial.println( ip );
 	#endif
+
 	// Update the dynamic DNS
 	update_dns( ip );
 }
@@ -53,9 +54,12 @@ void wifi_setup() {
  * @return {void}
 **/
 void wifi_loop() {
+	if (wifi_status != WL_CONNECTED)
+		return;
+
 	char buff[64];
 	int len = 64;
 
 	// Process any connections
-	webserver.processConnection(buff, &len);
+	webserver.processConnection();
 }

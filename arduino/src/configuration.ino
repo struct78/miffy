@@ -1,20 +1,26 @@
 enum Pattern {
 	WIPE,
+	DIAGONAL_WIPE,
 	RADIAL,
-	PULSE,
-	PATTERNMAX
+	RAINBOW_STRIPE
 };
 
 /* Neomatrix Specific constants */
-const int cols      = 8;
-const int rows      = 5;
-const int pin       = 6;
+const int cols           = 8;
+const int rows           = 5;
+const int pin            = 6;
+const int min_contrast   = 1;
+const int max_contrast   = 50;
+const int min_brightness = 1;
+const int max_brightness = 255;
+const int min_speed      = 1;
+const int max_speed      = 100;
+
 
 /* User-configurable variables */
-float theta         = 0.5;
-bool power          = true;
-int contrast        = 2;
-int brightness      = 64;
-Pattern pattern     = RADIAL;
-
-float delta         = 0;
+float theta              = 0.025;
+bool power               = true;
+int brightness           = 64;
+int contrast             = 5;
+Pattern pattern          = DIAGONAL_WIPE;
+float delta              = 0;

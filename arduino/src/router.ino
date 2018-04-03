@@ -14,7 +14,7 @@ void routes_default( WebServer &server, WebServer::ConnectionType type, char *ur
 
 	if (type == WebServer::GET)
 	{
-		P(helloMsg) = "<h1>Miffy</h1>";
+		P(helloMsg) = "<h1>Nightlight</h1>";
 		server.printP(helloMsg);
 	} else {
 		server.httpFail();
@@ -53,6 +53,9 @@ void routes_api_status( WebServer &server, WebServer::ConnectionType type, char 
 		server.print(", ");
 		server.print("\"contrast\": ");
 		server.print( get_neomatrix_contrast() );
+		server.print(", ");
+		server.print("\"pattern\": ");
+		server.print( get_neomatrix_pattern() );
 		server.print("}");
 		server.print("}");
 	} else {
@@ -81,9 +84,11 @@ void routes_api_speed( WebServer &server, WebServer::ConnectionType type, char *
 	{
 		set_neomatrix_speed( param_int( server, "speed" ) );
 
+		Serial.println(get_neomatrix_speed());
+
 		server.httpSuccess("application/json");
 		server.print("{ \"result\": ");
-		server.print( (float)get_neomatrix_speed() );
+		server.print( get_neomatrix_speed() );
 		server.print(" }");
 	} else {
 		server.httpFail();
@@ -205,9 +210,9 @@ void routes_api_pattern( WebServer &server, WebServer::ConnectionType type, char
 		set_neomatrix_pattern( param_int( server, "pattern" ) );
 
 		server.httpSuccess("application/json");
-		server.print("{ \"result\": \"");
+		server.print("{ \"result\": ");
 		server.print( (int)get_neomatrix_pattern() );
-		server.print("\" }");
+		server.print(" }");
 	} else {
 		server.httpFail();
 		server.print("{ \"error\": \"Method not allowed\" }");
@@ -263,9 +268,6 @@ bool param_bool( WebServer server, const char *key ) {
 		repeat = server.readPOSTparam(name, 16, value, 16);
 		if (strcmp(name, key) == 0)
 		{
-			#if defined( DEVELOPMENT )
-			Serial.println( value );
-			#endif
 			if ( strcmp(value, "true") == 0 ) {
 				returnValue = true;
 			}
