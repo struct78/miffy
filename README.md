@@ -41,13 +41,17 @@ An enumerator that determines how the LEDs animate. There are 4 options.
 
 To enable Wi-Fi connectivity, you will need to rename `credentials.sample` to `credentials.ino` and update the variables within.
 
-`char ssid[] = "YOUR NETWORK NAME";
-char pass[] = "YOUR NETWORK PASSWORD";`
+```c
+char ssid[] = "YOUR NETWORK NAME";
+char pass[] = "YOUR NETWORK PASSWORD";
+```
 
 The nightlight is discoverable via a free dynamic DNS service hosted by [Dynu](http://dynu.net/). Once it connects to your Wi-Fi, it will send a request to a dynamic DNS service to report its new IP address. The hostname is what the Ionic application uses to connect to the nightlight.
 
-`char dynamic_hostname_password[] = "YOUR DDNS PASSWORD";
-char dynamic_hostname[] = "YOUR_HOSTNAME.dynu.net";`
+```c
+char dynamic_hostname_password[] = "YOUR DDNS PASSWORD";
+char dynamic_hostname[] = "YOUR_HOSTNAME.dynu.net";
+```
 
 **Do not commit this file to source control**
 
