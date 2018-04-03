@@ -1,21 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { Observable } from "rxjs/Observable";
 import 'rxjs/Rx';
 
 export enum Patterns {
 	WIPE = 0,
-	RADIAL = 1,
-	PULSE = 2
+	DIAGONAL_WIPE = 1,
+	RADIAL = 2,
+	RAINBOW_STRIPE = 3
 };
 
 @Injectable()
 export class ArduinoService {
-	private client: Subject<any> = new Subject<any>();
-	private response: Observable<any>;
-	private api_url: string = "http://miffylamp.dynu.net/api";
-	//private api_url: string = "http://miffy.getsandbox.com";
+	private api_url: string = "http://nightlight-wifi.dynu.net/api";
 
 	constructor( private http : Http ) { }
 
@@ -100,7 +98,6 @@ export class ArduinoService {
 		if ( ex instanceof Response ) {
 			const body = ex.json() || '';
 			const err = body.error || JSON.stringify(body);
-			console.log(ex.json());
 			return Observable.throw( err );
 		} else {
 			return Observable.throw({

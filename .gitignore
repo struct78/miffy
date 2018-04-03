@@ -48,6 +48,7 @@ plugins
 *.log
 *.DS_Store
 app/scripts/configuration.js
+.sourcemaps
 
 # Arduino
 credentials.ino

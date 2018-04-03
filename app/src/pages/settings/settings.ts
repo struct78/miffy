@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, Loading, LoadingController, ToastController, AlertController } from 'ionic-angular';
+import { Loading, LoadingController, ToastController, AlertController } from 'ionic-angular';
 import { ArduinoService } from '../../services/arduino.service';
 
 @Component({
@@ -19,7 +19,6 @@ export class SettingsPage {
 	public isOffline: boolean = false;
 
 	constructor(
-		private nav: NavController,
 		private arduino: ArduinoService,
 		private loadingController: LoadingController,
 		private toastController: ToastController,
@@ -43,9 +42,11 @@ export class SettingsPage {
 			} );
 	}
 
-	onBrightnessChange( brightness : number ) {
+	onBrightnessChange( e ) {
+    if (!e) return;
+
 		this.arduino
-			.setBrightness( brightness )
+			.setBrightness( e.value )
 			.subscribe( ( data ) => {
 				this.showToast( 'Brightness changed!' );
 				this.saveState();
@@ -55,9 +56,11 @@ export class SettingsPage {
 			} );
 	}
 
-	onContrastChange( contrast : number ) {
+	onContrastChange( e ) {
+    if (!e) return;
+
 		this.arduino
-			.setContrast( contrast )
+			.setContrast( e.value )
 			.subscribe( ( data ) => {
 				this.showToast( 'Contrast changed!' );
 				this.saveState();
@@ -67,9 +70,11 @@ export class SettingsPage {
 			} );
 	}
 
-	onSpeedChange( speed : number ) {
+	onSpeedChange( e ) {
+    if (!e) return;
+
 		this.arduino
-			.setSpeed( speed )
+			.setSpeed( e.value )
 			.subscribe( ( data ) => {
 				this.showToast( 'Speed changed!' );
 				this.saveState();
@@ -80,6 +85,8 @@ export class SettingsPage {
 	}
 
 	onPatternChange( pattern: number ) {
+    if (!pattern) return;
+
 		this.arduino
 			.setPattern( pattern )
 			.subscribe( ( data ) => {
@@ -98,7 +105,7 @@ export class SettingsPage {
 		this.isOnline = false;
 
 		this.loader = this.loadingController.create({
-			content: "Finding Miffy...",
+			content: "Finding Nightlight...",
 			spinner: "crescent",
 			duration: 2500
 		});
@@ -115,6 +122,7 @@ export class SettingsPage {
 							role: 'cancel',
 							handler: () => {
 								this.isOffline = true;
+                this.isOnline = false;
 							}
 						},
 						{
@@ -140,8 +148,10 @@ export class SettingsPage {
 				this.pattern = data.result.pattern;
 				this.didLoad = true;
 				this.isOnline = true;
+        this.isOffline = false;
 				this.saveState();
 			}, ( ex ) => {
+        console.log(ex);
 				this.showToast( ex.message, 'error' );
 			} );
 	}

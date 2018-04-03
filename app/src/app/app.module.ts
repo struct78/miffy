@@ -1,25 +1,29 @@
 import { NgModule, ErrorHandler } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { Storage } from '@ionic/storage';
-import { Miffy } from './app.component';
+import { HttpModule } from '@angular/http';
+import { Nightlight } from './app.component';
 import { SettingsPage } from '../pages/settings/settings';
+import { OfflinePage } from '../pages/offline/offline';
 import { ArduinoService } from '../services/arduino.service';
 
 @NgModule({
   declarations: [
-    Miffy,
-    SettingsPage
+    Nightlight,
+    SettingsPage,
+    OfflinePage
   ],
   imports: [
-    IonicModule.forRoot(Miffy)
+    BrowserModule,
+    HttpModule,
+    IonicModule.forRoot(Nightlight)
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    Miffy,
+    Nightlight,
     SettingsPage
   ],
   providers: [
-		Storage,
 		ArduinoService,
 		{
 			provide: ErrorHandler,

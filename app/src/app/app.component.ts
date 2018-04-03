@@ -6,7 +6,7 @@ import { SettingsPage } from '../pages/settings/settings';
 @Component({
   templateUrl: 'app.html'
 })
-export class Miffy {
+export class Nightlight {
   rootPage = SettingsPage;
   constructor( platform: Platform ) {
     platform.ready().then(() => {
