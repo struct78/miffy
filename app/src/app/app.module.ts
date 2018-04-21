@@ -1,33 +1,32 @@
-import { NgModule, ErrorHandler } from '@angular/core';
+import { Arduino } from '../providers/arduino/arduino';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { HttpClientModule } from '@angular/common/http';
 import { HttpModule } from '@angular/http';
+import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { IonicStorageModule } from '@ionic/storage';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { Nightlight } from './app.component';
-import { SettingsPage } from '../pages/settings/settings';
-import { OfflinePage } from '../pages/offline/offline';
-import { ArduinoService } from '../services/arduino.service';
 
 @NgModule({
   declarations: [
-    Nightlight,
-    SettingsPage,
-    OfflinePage
+    Nightlight
   ],
   imports: [
     BrowserModule,
     HttpModule,
-    IonicModule.forRoot(Nightlight)
+    HttpClientModule,
+    IonicModule.forRoot(Nightlight),
+    IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    Nightlight,
-    SettingsPage
+    Nightlight
   ],
   providers: [
-		ArduinoService,
+		Arduino,
 		{
 			provide: ErrorHandler,
 			useClass: IonicErrorHandler
 		} ]
 })
-export class AppModule {}
+export class AppModule { }

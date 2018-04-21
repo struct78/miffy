@@ -23,7 +23,13 @@ void wifi_setup() {
 		Serial.print( F("Attempting to connect to SSID: ") );
 		Serial.println( ssid );
 		#endif
-		wifi_status = WiFi.begin(ssid, pass);
+
+		if ( strcmp(pass, "") != 0 ) {
+			wifi_status = WiFi.begin(ssid, pass);
+		} else {
+			wifi_status = WiFi.begin(ssid);
+		}
+
 		delay(5000);
 	}
 
@@ -35,6 +41,7 @@ void wifi_setup() {
 	webserver.addCommand("api/brightness", &routes_api_brightness);
 	webserver.addCommand("api/contrast", &routes_api_contrast);
 	webserver.addCommand("api/pattern", &routes_api_pattern);
+	webserver.addCommand("api/health", &routes_api_health);
 	webserver.begin();
 
 	// The local IP address
@@ -61,5 +68,5 @@ void wifi_loop() {
 	int len = 64;
 
 	// Process any connections
-	webserver.processConnection();
+	webserver.processConnection(buff, &len);
 }

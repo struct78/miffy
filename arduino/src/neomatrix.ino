@@ -95,7 +95,7 @@ int get_neomatrix_contrast() {
  * @return {void}
 **/
 void set_neomatrix_pattern( int p ) {
-	pattern = (Pattern)constrain( p, 0, RAINBOW_STRIPE );
+	pattern = (Pattern)constrain( p, 0, FIREPLACE );
 }
 
 /**
@@ -158,7 +158,9 @@ uint16_t hsl_to_rgb( float h, float s, float l ) {
 **/
 void neomatrix_loop() {
 	uint8_t x, y, z;
-	float hue = 0.0;
+	float h = 0.0;
+	float s = 1.0;
+	float b = 0.5;
 
 	if ( get_neomatrix_power() ) {
 		matrix.setBrightness( get_neomatrix_brightness() );
@@ -172,32 +174,34 @@ void neomatrix_loop() {
 		for ( x = 0 ; x < rows ; x++ ) {
 			for ( y = 0 ; y < cols ; y++ ) {
 				z = x + y;
-				float distance = dist( (float)rows/2, (float)cols/2, (float)x, (float)y );
+				float distance = dist( (float)rows/2, (float)cols/2, (float)x+.5, (float)y+.5 );
 				switch ( pattern ) {
 					case RADIAL:
-						hue = (float)(int((delta - distance) * contrast) % 360) / 360;
-						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ) );
+						h = (float)(int( ( delta - distance ) * contrast ) % 360 ) / 360;
 						break;
 					case WIPE:
-						hue = (float)(int((delta + y) * contrast) % 360) / 360;
-						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ));
+						h = (float)(int( ( delta + y ) * contrast ) % 360 ) / 360;
 						break;
 					case DIAGONAL_WIPE:
-						hue = (float)(int((delta + z) * contrast) % 360) / 360;
-						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ));
+						h = (float)(int( ( delta + z ) * contrast ) % 360 ) / 360;
 						break;
 					case RAINBOW_STRIPE:
-						hue = (float)(int(((360 / rows) * x) + delta * contrast) % 360) / 360;
-						matrix.drawPixel( x, y, hsl_to_rgb( hue, 1.0, 0.5 ) );
+						h = (float)(int( ( ( 360 / rows ) * x ) + delta * contrast ) % 360) / 360;
+						break;
+					case FIREPLACE:
+						h = (float)( 1 + abs( sin( delta ) + sin( z ) * 35 ) ) / 360;
+						b = constrain( mapf( cos( delta ) + cos( distance ) + random( -0.35, 0.35 ), 0.0, 1.0, 0.45, 0.7 ), 0.45, 0.7 );
 						break;
 					default:
 						break;
 				}
+
+				matrix.drawPixel( x, y, hsl_to_rgb( h, s, b ) );
 			}
 		}
 	}
 	else {
-		matrix.fillScreen(0);
+		matrix.fillScreen( 0 );
 	}
 
 	matrix.show();

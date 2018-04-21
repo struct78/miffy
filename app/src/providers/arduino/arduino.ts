@@ -12,8 +12,8 @@ export enum Patterns {
 };
 
 @Injectable()
-export class ArduinoService {
-	private api_url: string = "http://nightlight-wifi.dynu.net/api";
+export class Arduino {
+	private service_url: string;
 
 	constructor( private http : Http ) { }
 
@@ -70,15 +70,28 @@ export class ArduinoService {
 
 	/**
 	 * @name getStatus
+	 * @param {string} subdomain the dynu.net subdomain
 	 * @description Gets the status of the lamp
 	 * @return {Subject<any>} client
 	**/
-	getStatus() : Observable<any> {
+	getStatus( subdomain: string ) : Observable<any> {
+		this.service_url = 'http://'  + subdomain + '.dynu.net/api';
 		return this.get( 'status' );
 	}
 
+	/**
+	 * @name getHealth
+	 * @param {string} subdomain the dynu.net subdomain
+	 * @description Pings the health endpoint to see if it's available
+	 * @return {Subject<any>} client
+	**/
+	getHealth( subdomain: string ) : Observable<any> {
+		this.service_url = 'http://' + subdomain + '.dynu.net/api';
+		return this.get( 'health' );
+	}
+
 	private get( operation: string ) : Observable<any> {
-		return this.http.get( this.api_url.concat( '/', operation ) )
+		return this.http.get( this.service_url.concat( '/', operation ) )
 			.map( ( response: Response ) => response.json() )
 			.catch( ( response: Response ) => this.handleError( response ) );
 	}
@@ -89,7 +102,7 @@ export class ArduinoService {
 		let body = new URLSearchParams();
 		body.set( key || operation , value );
 
-		return this.http.post( this.api_url.concat( '/', operation ), body, requestOptions )
+		return this.http.post( this.service_url.concat( '/', operation ), body, requestOptions )
 			.map( ( response:Response ) =>  response.json() )
 			.catch( ( response: Response ) => this.handleError( response ) );
 	}

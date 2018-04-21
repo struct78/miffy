@@ -3,7 +3,7 @@
 #include <WebServer.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_NeoMatrix.h>
-#define DEVELOPMENT 0
+#define DEVELOPMENT 1
 #define WEBDUINO_SERIAL_DEBUGGING 1
 #define WEBDUINO_READ_TIMEOUT_IN_MS 250
 

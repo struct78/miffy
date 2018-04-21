@@ -17,4 +17,47 @@ page-settings {
 			}
 		}
 	}
+
+	@keyframes ellipsis {
+	  to {
+	    width: 1.25em;
+	  }
+	}
+
+	@-webkit-keyframes ellipsis {
+	  to {
+	    width: 1.25em;
+	  }
+	}
+
+	.settings {
+		&-list-header {
+			background: map-get($colors, light);
+			color: map-get($colors, primary);
+			margin-top: $content-padding;
+		}
+
+		&-status {
+			&-online {
+				color: map-get($colors, online);
+			}
+
+			&-connecting {
+				color: map-get($colors, connecting);
+				&::after {
+				  overflow: hidden;
+				  display: inline-block;
+				  vertical-align: bottom;
+				  animation: ellipsis steps(4,end) 900ms infinite;
+				  content: "\2026";
+				  width: 0px;
+				}
+
+			}
+
+			&-offline {
+				color: map-get($colors, offline);
+			}
+		}
+	}
 }

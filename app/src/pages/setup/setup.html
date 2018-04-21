@@ -1,0 +1,47 @@
+<ion-content class="setup">
+	<ion-content>
+		<ion-grid>
+			<ion-row>
+				<ion-col>
+					<img class="setup-icon" src="assets/img/light-bulb.svg"/>
+				</ion-col>
+			</ion-row>
+			<ion-row>
+				<ion-col>
+					<h1 ion-text text-center>Wi-Fi Nightlight</h1>
+					<h2 ion-text text-center>Setup</h2>
+				</ion-col>
+			</ion-row>
+			<ion-row>
+				<ion-col class="setup-content">
+					<ion-label text-wrap color="light">
+						To start using the nightlight, you will need to create a free Dynamic DNS service with <a href="http://dynu.net/" color="light">dynu.net</a>.
+					</ion-label>
+					<ion-label text-wrap color="light">
+						Once you have done this, and updated the code on your Arduino, simply enter the subdomain in the input below and click connect!
+					</ion-label>
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+		<ion-grid class="setup-input-container">
+			<ion-row align-items-center>
+				<ion-col class="col-left" justify-self-end>
+					<ion-label class="label-start" item-start>http://</ion-label>
+				</ion-col>
+				<ion-col class="col-middle" col-auto>
+					<ion-input class="setup-input" autocapitalize="none" placeholder="your-ddns-domain" [(ngModel)]="subdomain" name="subdomain">your-nightlight-wifi</ion-input>
+				</ion-col>
+				<ion-col class="col-right">
+					<ion-label class="label-end" item-end>.dynu.net</ion-label>
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+		<ion-grid>
+			<ion-row>
+				<ion-col>
+					<button ion-button block color="button" (click)="connect($event)" [disabled]="!subdomain">Connect</button>
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+	</ion-content>
+</ion-content>

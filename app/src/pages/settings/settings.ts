@@ -1,10 +1,19 @@
+import { Arduino } from '../../providers/arduino/arduino';
+import { Config } from '../../providers/config/config';
 import { Component } from '@angular/core';
-import { Loading, LoadingController, ToastController, AlertController } from 'ionic-angular';
-import { ArduinoService } from '../../services/arduino.service';
+import {
+	IonicPage,
+	IonicPageModule,
+	Alert,
+	AlertController,
+	ToastController
+} from 'ionic-angular';
+import { Storage } from '@ionic/storage';
 
+@IonicPage()
 @Component({
-  selector: 'page-settings',
-  templateUrl: 'settings.html'
+	selector: 'page-settings',
+	templateUrl: 'settings.html'
 })
 export class SettingsPage {
 	private power : boolean;
@@ -12,18 +21,29 @@ export class SettingsPage {
 	private speed: number;
 	private contrast: number;
 	private pattern: number;
-	private loader: Loading;
-	private didLoad: boolean;
+	private didConnect: boolean;
+	private isConnecting: boolean;
 	private state: any;
 	public isOnline: boolean = false;
 	public isOffline: boolean = false;
+	public min_contrast: number;
+	public max_contrast: number;
+	public min_brightness: number;
+	public max_brightness: number;
+	public min_speed:number;
+	public max_speed:number;
 
 	constructor(
-		private arduino: ArduinoService,
-		private loadingController: LoadingController,
+		private arduino: Arduino,
+		private storage: Storage,
 		private toastController: ToastController,
-		private alertController: AlertController
-	 ) { }
+		private alertController: AlertController ) {
+	}
+
+	ionViewDidLoad() {
+		this.getState();
+		this.getStatus();
+	}
 
 	onPowerChange( power : boolean ) {
 		this.arduino
@@ -43,7 +63,7 @@ export class SettingsPage {
 	}
 
 	onBrightnessChange( e ) {
-    if (!e) return;
+		if (!e) return;
 
 		this.arduino
 			.setBrightness( e.value )
@@ -57,7 +77,7 @@ export class SettingsPage {
 	}
 
 	onContrastChange( e ) {
-    if (!e) return;
+		if (!e) return;
 
 		this.arduino
 			.setContrast( e.value )
@@ -71,7 +91,7 @@ export class SettingsPage {
 	}
 
 	onSpeedChange( e ) {
-    if (!e) return;
+		if (!e) return;
 
 		this.arduino
 			.setSpeed( e.value )
@@ -85,7 +105,7 @@ export class SettingsPage {
 	}
 
 	onPatternChange( pattern: number ) {
-    if (!pattern) return;
+		if (!pattern) return;
 
 		this.arduino
 			.setPattern( pattern )
@@ -99,61 +119,62 @@ export class SettingsPage {
 	}
 
 	getStatus() {
-		// This code block had to be moved to ngAfterViewInit() because it simply refused to work properly when
-		// it was in ngOnInit(). It would work in ngOnInit() if I called it twice (???);
-		this.isOffline = false;
-		this.isOnline = false;
-
-		this.loader = this.loadingController.create({
-			content: "Finding Nightlight...",
-			spinner: "crescent",
-			duration: 2500
-		});
-
-		this.loader.present();
-		this.loader.onDidDismiss( () => {
-			if ( !this.didLoad ) {
-				let alert = this.alertController.create({
-					title: 'Connect failed',
-					message: 'Do you want to try again?',
-					buttons: [
-						{
-							text: 'Cancel',
-							role: 'cancel',
-							handler: () => {
-								this.isOffline = true;
-                this.isOnline = false;
-							}
-						},
-						{
-							text: 'Yes',
-							handler: () => {
-								this.getStatus();
-							}
-						}
-					]
-				});
-				alert.present();
+		this.storage.get( 'subdomain' ).then( ( subdomain ) => {
+			if ( subdomain ) {
+				this.isConnecting = true;
+				this.arduino
+					.getStatus( subdomain )
+					.subscribe( ( data ) => {
+						this.power = data.result.power as boolean;
+						this.brightness = data.result.brightness.current;
+						this.speed = data.result.speed.current;
+						this.contrast = data.result.contrast.current;
+						this.pattern = data.result.pattern;
+						this.min_brightness = data.result.brightness.min;
+						this.max_brightness = data.result.brightness.max;
+						this.min_speed = data.result.speed.min;
+						this.max_speed = data.result.speed.max;
+						this.min_contrast = data.result.contrast.min;
+						this.max_contrast = data.result.contrast.max;
+						this.didConnect = true;
+						this.isConnecting = false;
+						this.saveState();
+					}, ( ex ) => {
+						let alert = this.alertController.create({
+							title: Config.alert.title,
+							message: Config.alert.message,
+							buttons: [{
+								text: 'Cancel',
+								role: 'cancel',
+								handler: () => {
+									this.isConnecting = false;
+									this.didConnect = false;
+								}
+							}, {
+								text: 'Yes',
+								handler: () => {
+									this.getStatus();
+								}
+							}]
+						});
+						alert.present();
+					});
 			}
-		} );
+		});
+	}
 
-		this.arduino
-			.getStatus()
-			.subscribe( ( data ) => {
-				this.loader.dismiss();
-				this.power = data.result.power as boolean;
-				this.brightness = data.result.brightness;
-				this.speed = data.result.speed;
-				this.contrast = data.result.contrast;
-				this.pattern = data.result.pattern;
-				this.didLoad = true;
-				this.isOnline = true;
-        this.isOffline = false;
-				this.saveState();
-			}, ( ex ) => {
-        console.log(ex);
-				this.showToast( ex.message, 'error' );
-			} );
+	getState() {
+		this.storage.get( 'state' ).then( ( state ) => {
+			if ( state ) {
+				this.state = {
+					contrast: state.contrast,
+					speed: state.speed,
+					power: state.power,
+					brightness: state.brightness,
+					pattern: state.pattern
+				}
+			}
+		});
 	}
 
 	saveState() {
@@ -164,6 +185,8 @@ export class SettingsPage {
 			brightness: this.brightness || 0,
 			pattern: this.pattern || -1
 		};
+
+		this.storage.set( 'state', this.state );
 	}
 
 	showToast( message: string, className: string = 'success' ): void {
@@ -173,10 +196,5 @@ export class SettingsPage {
 			cssClass: className,
 		});
 		toast.present();
-	}
-
-	ngOnInit(): void {
-		this.saveState();
-		this.getStatus();
 	}
 }

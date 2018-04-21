@@ -22,17 +22,21 @@
 // The "primary" color is the only required color in the map.
 
 $colors: (
-  primary:    #387ef5,
-  secondary:  #32db64,
-  danger:     #f53d3d,
+  primary:    #C9283E,
+  secondary:  #540032,
+  danger:     #820333,
   light:      #f4f4f4,
-  dark:       #222
+  dark:       #2E112D,
+  button:     #FFCD00,
+  online:     #4E9E3F,
+  offline:    #F01D1B,
+  connecting: #F78D0A
 );
 
 $backdrop-color: #FFF;
-$toast-ios-background: #E8641A;
-$button-ios-background-color: #E8641A;
-
+$toast-ios-background: #f4f4f4;
+$button-ios-background-color: #f4f4f4;
+$link-color: map-get($colors, button);
 
 // App iOS Variables
 // --------------------------------------------------

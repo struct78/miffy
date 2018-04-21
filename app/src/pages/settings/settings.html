@@ -1,54 +1,70 @@
-<ion-content padding="20" [hidden]="!isOffline" class="centered">
-	<ion-content>
-		<img src="assets/img/light-offline.svg" class="offline-icon"/>
-		<p>Nightlight is currently offline.</p>
-		<button ion-button block (click)="getStatus()">Try Again</button>
-	</ion-content>
-</ion-content>
+<ion-header>
+  <ion-navbar hideBackButton color="secondary">
+		<button ion-button menuToggle>
+			<ion-icon name="menu"></ion-icon>
+		</button>
+		<ion-title>
+			Nightlight Wi-Fi
+		</ion-title>
+  </ion-navbar>
+</ion-header>
 
+<ion-content padding>
+  <ion-list-header class="settings-list-header">
+    Nightlight Status:
+      <span class="settings-status-offline" *ngIf="!didConnect && !isConnecting">Offline</span>
+      <span class="settings-status-connecting" *ngIf="isConnecting">Connecting</span>
+      <span class="settings-status-online" *ngIf="didConnect && !isConnecting">Online</span>
+  </ion-list-header>
 
-<ion-content padding="20" [hidden]="!isOnline">
+  <ion-list-header class="settings-list-header">
+    Settings
+  </ion-list-header>
 	<ion-item>
-		<ion-label> Power On</ion-label>
-		<ion-toggle checked="true" [(ngModel)]="power" (ngModelChange)="onPowerChange($event)" ngDefaultControl></ion-toggle>
+		<ion-label> Power</ion-label>
+		<ion-toggle checked="true" [(ngModel)]="power" (ngModelChange)="onPowerChange($event)"  [disabled]="!didConnect"></ion-toggle>
 	</ion-item>
 	<ion-item>
-		<ion-range [(ngModel)]="brightness" (ionChange)="onBrightnessChange($event)" debounce="500" min="1" max="255">
+		<ion-range [(ngModel)]="brightness" (ionChange)="onBrightnessChange($event)" debounce="500" (min)="min_brightness" (max)="max_brightness" [disabled]="!didConnect">
 			<ion-icon range-left small name="sunny" min="1"></ion-icon>
 			<ion-icon range-right name="sunny" max="255"></ion-icon>
 		</ion-range>
 	</ion-item>
 	<ion-item>
-		<ion-range [(ngModel)]="contrast" (ionChange)="onContrastChange($event)" debounce="500"  min="1" max="50">
+		<ion-range [(ngModel)]="contrast" (ionChange)="onContrastChange($event)" debounce="500" (min)="min_contrast" (max)="max_contrast" [disabled]="!didConnect">
 			<ion-icon range-left small name="contrast"></ion-icon>
 			<ion-icon range-right name="contrast"></ion-icon>
 		</ion-range>
 	</ion-item>
 	<ion-item>
-		<ion-range [(ngModel)]="speed" (ionChange)="onSpeedChange($event)" debounce="500" min="1" max="100">
+		<ion-range [(ngModel)]="speed" (ionChange)="onSpeedChange($event)" debounce="500" (min)="min_speed" (max)="max_speed" [disabled]="!didConnect">
 			<ion-icon range-left small name="speedometer"></ion-icon>
 			<ion-icon range-right name="speedometer"></ion-icon>
 		</ion-range>
 	</ion-item>
 	<ion-list radio-group [(ngModel)]="pattern" (ngModelChange)="onPatternChange($event)" debounce="500">
-		<ion-list-header>
-			Pattern
+		<ion-list-header class="settings-list-header">
+			Transition Pattern
 		</ion-list-header>
 		<ion-item>
 			<ion-label>Wipe</ion-label>
-			<ion-radio text="WIPE" value="0"></ion-radio>
+			<ion-radio text="WIPE" value="0" [disabled]="!didConnect"></ion-radio>
 		</ion-item>
 		<ion-item>
 			<ion-label>Diagonal Wipe</ion-label>
-			<ion-radio text="DIAGONAL_WIPE" value="1"></ion-radio>
+			<ion-radio text="DIAGONAL_WIPE" value="1" [disabled]="!didConnect"></ion-radio>
 		</ion-item>
 		<ion-item>
 			<ion-label>Radial</ion-label>
-			<ion-radio text="RADIAL" value="2"></ion-radio>
+			<ion-radio text="RADIAL" value="2" [disabled]="!didConnect"></ion-radio>
 		</ion-item>
 		<ion-item>
 			<ion-label>Rainbow Stripe</ion-label>
-			<ion-radio text="RAINBOW_STRIPE" value="3"></ion-radio>
+			<ion-radio text="RAINBOW_STRIPE" value="3" [disabled]="!didConnect"></ion-radio>
+		</ion-item>
+		<ion-item>
+			<ion-label>Fireplace</ion-label>
+			<ion-radio text="FIREPLACE" value="4" [disabled]="!didConnect"></ion-radio>
 		</ion-item>
 	</ion-list>
 </ion-content>

@@ -1,1 +1,19 @@
-<ion-nav [root]="rootPage"></ion-nav>
+<ion-menu [content]="settings" persistent="true">
+	<ion-header>
+    <ion-toolbar color="secondary">
+			<ion-title>
+				Settings
+			</ion-title>
+    </ion-toolbar>
+	</ion-header>
+	<ion-content secondary>
+		<ion-item>Settings</ion-item>
+		<ion-item>Settings</ion-item>
+		<ion-item>Settings</ion-item>
+		<ion-item>Settings</ion-item>
+		<ion-item>Settings</ion-item>
+		<ion-item>Settings</ion-item>
+	</ion-content>
+</ion-menu>
+
+<ion-nav #settings [root]="rootPage"></ion-nav>
