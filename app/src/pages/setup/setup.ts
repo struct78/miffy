@@ -19,6 +19,7 @@ import { Config } from '../../providers/config/config';
 
 export class SetupPage {
 	public subdomain: string;
+	private hasSubdomain: boolean = false;
 	private didConnect: boolean = false;
 	private loader: Loading;
 
@@ -29,6 +30,16 @@ export class SetupPage {
 		private alertController: AlertController,
 		private storage: Storage,
 		private menu: MenuController) {
+	}
+
+	ionViewDidLoad() {
+		this.checkForSubdomain();
+	}
+
+	checkForSubdomain() {
+		this.storage.get( 'subdomain' ).then( ( subdomain ) => {
+			this.hasSubdomain = true;
+		});
 	}
 
 	saveSubdomain() {

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Platform } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { Platform, Nav } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
 import { Storage } from '@ionic/storage';
 
@@ -7,6 +7,8 @@ import { Storage } from '@ionic/storage';
 	templateUrl: 'app.html'
 })
 export class Nightlight {
+	@ViewChild(Nav) nav: Nav;
+
 	rootPage = 'SettingsPage';
 
 	constructor( platform: Platform, private storage: Storage ) {
@@ -25,5 +27,9 @@ export class Nightlight {
 				});
 			});
 		});
+	}
+
+	go( page: string ) {
+		this.nav.setRoot(page);
 	}
 }

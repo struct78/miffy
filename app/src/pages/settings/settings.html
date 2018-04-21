@@ -11,15 +11,12 @@
 
 <ion-content padding>
   <ion-list-header class="settings-list-header">
-    Nightlight Status:
+    Status:
       <span class="settings-status-offline" *ngIf="!didConnect && !isConnecting">Offline</span>
       <span class="settings-status-connecting" *ngIf="isConnecting">Connecting</span>
       <span class="settings-status-online" *ngIf="didConnect && !isConnecting">Online</span>
   </ion-list-header>
 
-  <ion-list-header class="settings-list-header">
-    Settings
-  </ion-list-header>
 	<ion-item>
 		<ion-label> Power</ion-label>
 		<ion-toggle checked="true" [(ngModel)]="power" (ngModelChange)="onPowerChange($event)"  [disabled]="!didConnect"></ion-toggle>
