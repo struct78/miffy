@@ -6,7 +6,8 @@ import {
 	IonicPageModule,
 	Alert,
 	AlertController,
-	ToastController
+	ToastController,
+	Platform
 } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 
@@ -37,7 +38,14 @@ export class SettingsPage {
 		private arduino: Arduino,
 		private storage: Storage,
 		private toastController: ToastController,
-		private alertController: AlertController ) {
+		private alertController: AlertController,
+		public platform: Platform ) {
+			// Subscribe on resume
+			this.platform.resume.subscribe(() => {
+			console.log('resume');
+				this.getState();
+				this.getStatus();
+			});
 	}
 
 	ionViewDidLoad() {
