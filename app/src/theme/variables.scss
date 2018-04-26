@@ -33,16 +33,16 @@ $colors: (
   connecting: #F78D0A
 );
 
-$backdrop-color: #FFF;
-$toast-ios-background: #f4f4f4;
-$button-ios-background-color: #f4f4f4;
+$backdrop-color: map-get($colors, light);
 $link-color: map-get($colors, button);
 
 // App iOS Variables
 // --------------------------------------------------
 // iOS only Sass variables can go here
 
-
+$toast-ios-title-color: map-get($colors, danger);
+$toast-ios-background: map-get($colors, light);
+$button-ios-background-color: map-get($colors, light);
 
 
 // App Material Design Variables
