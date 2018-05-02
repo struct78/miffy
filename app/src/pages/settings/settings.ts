@@ -1,6 +1,7 @@
 import { Arduino } from '../../providers/arduino/arduino';
 import { Config } from '../../providers/config/config';
 import { Component } from '@angular/core';
+import { Storage } from '@ionic/storage';
 import {
 	IonicPage,
 	IonicPageModule,
@@ -9,7 +10,6 @@ import {
 	ToastController,
 	Platform
 } from 'ionic-angular';
-import { Storage } from '@ionic/storage';
 
 @IonicPage()
 @Component({
@@ -35,22 +35,26 @@ export class SettingsPage {
 	public max_speed:number;
 
 	constructor(
-		private arduino: Arduino,
-		private storage: Storage,
-		private toastController: ToastController,
-		private alertController: AlertController,
+		public arduino: Arduino,
+		public storage: Storage,
+		public toastController: ToastController,
+		public alertController: AlertController,
 		public platform: Platform ) {
 			// Subscribe on resume
 			this.platform.resume.subscribe(() => {
-			console.log('resume');
-				this.getState();
-				this.getStatus();
+				this.connect();
 			});
 	}
 
 	ionViewDidLoad() {
-		this.getState();
-		this.getStatus();
+		this.connect();
+	}
+
+	connect() {
+		this.arduino.setup().then(() => {
+			this.getState();
+			this.getStatus();
+		});
 	}
 
 	onPowerChange( power : boolean ) {
@@ -127,48 +131,44 @@ export class SettingsPage {
 	}
 
 	getStatus() {
-		this.storage.get( 'subdomain' ).then( ( subdomain ) => {
-			if ( subdomain ) {
-				this.isConnecting = true;
-				this.arduino
-					.getStatus( subdomain )
-					.subscribe( ( data ) => {
-						this.power = data.result.power as boolean;
-						this.brightness = data.result.brightness.current;
-						this.speed = data.result.speed.current;
-						this.contrast = data.result.contrast.current;
-						this.pattern = data.result.pattern;
-						this.min_brightness = data.result.brightness.min;
-						this.max_brightness = data.result.brightness.max;
-						this.min_speed = data.result.speed.min;
-						this.max_speed = data.result.speed.max;
-						this.min_contrast = data.result.contrast.min;
-						this.max_contrast = data.result.contrast.max;
-						this.didConnect = true;
-						this.isConnecting = false;
-						this.saveState();
-					}, ( ex ) => {
-						let alert = this.alertController.create({
-							title: Config.alert.title,
-							message: Config.alert.message,
-							buttons: [{
-								text: 'Cancel',
-								role: 'cancel',
-								handler: () => {
-									this.isConnecting = false;
-									this.didConnect = false;
-								}
-							}, {
-								text: 'Yes',
-								handler: () => {
-									this.getStatus();
-								}
-							}]
-						});
-						alert.present();
+			this.isConnecting = true;
+			this.arduino
+				.getStatus()
+				.subscribe( ( data ) => {
+					this.power = data.result.power as boolean;
+					this.brightness = data.result.brightness.current;
+					this.speed = data.result.speed.current;
+					this.contrast = data.result.contrast.current;
+					this.pattern = data.result.pattern;
+					this.min_brightness = data.result.brightness.min;
+					this.max_brightness = data.result.brightness.max;
+					this.min_speed = data.result.speed.min;
+					this.max_speed = data.result.speed.max;
+					this.min_contrast = data.result.contrast.min;
+					this.max_contrast = data.result.contrast.max;
+					this.didConnect = true;
+					this.isConnecting = false;
+					this.saveState();
+				}, ( ex ) => {
+					let alert = this.alertController.create({
+						title: Config.alert.title,
+						message: Config.alert.message,
+						buttons: [{
+							text: 'Cancel',
+							role: 'cancel',
+							handler: () => {
+								this.isConnecting = false;
+								this.didConnect = false;
+							}
+						}, {
+							text: 'Yes',
+							handler: () => {
+								this.getStatus();
+							}
+						}]
 					});
-			}
-		});
+					alert.present();
+				});
 	}
 
 	getState() {
@@ -202,6 +202,7 @@ export class SettingsPage {
 			message: message,
 			duration: 1750,
 			cssClass: className,
+			position: 'top'
 		});
 		toast.present();
 	}

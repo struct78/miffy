@@ -30,7 +30,8 @@ $colors: (
   button:     #FFCD00,
   online:     #4E9E3F,
   offline:    #F01D1B,
-  connecting: #F78D0A
+  connecting: #F78D0A,
+  white:      #ffffff
 );
 
 $backdrop-color: map-get($colors, light);

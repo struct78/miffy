@@ -65,7 +65,7 @@ export class SetupPage {
 		this.presentLoader();
 		this.addEventHandlers();
 		this.arduino
-			.getHealth( this.subdomain )
+			.getHealth()
 			.subscribe( (data) => {
 				this.didConnect = true;
 				this.loader.dismiss();
@@ -77,7 +77,9 @@ export class SetupPage {
 
 	connect() {
 		this.saveSubdomain();
-		this.getStatus();
+		this.arduino.setup().then(() => {
+			this.getStatus();
+		});
 	}
 
 	onDidDismiss() {

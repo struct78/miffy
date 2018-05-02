@@ -8,25 +8,25 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { Nightlight } from './app.component';
 
 @NgModule({
-  declarations: [
-    Nightlight
-  ],
-  imports: [
-    BrowserModule,
-    HttpModule,
-    HttpClientModule,
-    IonicModule.forRoot(Nightlight),
-    IonicStorageModule.forRoot()
-  ],
-  bootstrap: [IonicApp],
-  entryComponents: [
-    Nightlight
-  ],
-  providers: [
+	declarations: [
+		Nightlight
+	],
+	imports: [
+		BrowserModule,
+		HttpModule,
+		HttpClientModule,
+		IonicModule.forRoot(Nightlight),
+		IonicStorageModule.forRoot()
+	],
+	bootstrap: [IonicApp],
+	entryComponents: [
+		Nightlight
+	],
+	providers: [
 		Arduino,
 		{
 			provide: ErrorHandler,
 			useClass: IonicErrorHandler
-		} ]
+		}]
 })
 export class AppModule { }

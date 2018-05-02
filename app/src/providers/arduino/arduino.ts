@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Storage } from '@ionic/storage';
 import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -15,7 +16,8 @@ export enum Patterns {
 export class Arduino {
 	private service_url: string;
 
-	constructor( private http : Http ) { }
+	constructor( private http : Http, private storage : Storage ) {
+	}
 
 	/**
 	 * @name setBrightness
@@ -70,24 +72,27 @@ export class Arduino {
 
 	/**
 	 * @name getStatus
-	 * @param {string} subdomain the dynu.net subdomain
 	 * @description Gets the status of the lamp
 	 * @return {Subject<any>} client
 	**/
-	getStatus( subdomain: string ) : Observable<any> {
-		this.service_url = 'http://'  + subdomain + '.dynu.net/api';
+	getStatus() : Observable<any> {
 		return this.get( 'status' );
 	}
 
 	/**
 	 * @name getHealth
-	 * @param {string} subdomain the dynu.net subdomain
 	 * @description Pings the health endpoint to see if it's available
 	 * @return {Subject<any>} client
 	**/
-	getHealth( subdomain: string ) : Observable<any> {
-		this.service_url = 'http://' + subdomain + '.dynu.net/api';
+	getHealth() : Observable<any> {
 		return this.get( 'health' );
+	}
+
+	setup() : Promise<boolean> {
+		return this.storage.get( 'subdomain' ).then( ( subdomain ) => {
+			this.service_url = 'http://' + subdomain + '.getsandbox.com';
+			return true;
+		});
 	}
 
 	private get( operation: string ) : Observable<any> {
