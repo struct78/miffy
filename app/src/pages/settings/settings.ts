@@ -51,7 +51,7 @@ export class SettingsPage {
 	}
 
 	connect() {
-		this.arduino.setup().then(() => {
+		this.arduino.ready().then(() => {
 			this.getState();
 			this.getStatus();
 		});

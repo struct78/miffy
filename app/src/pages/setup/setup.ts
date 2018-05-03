@@ -21,6 +21,7 @@ export class SetupPage {
 	public subdomain: string;
 	private hasSubdomain: boolean = false;
 	private didConnect: boolean = false;
+	private isFirstLoad: boolean = true;
 	private loader: Loading;
 
 	constructor(
@@ -38,7 +39,11 @@ export class SetupPage {
 
 	checkForSubdomain() {
 		this.storage.get( 'subdomain' ).then( ( subdomain ) => {
-			this.hasSubdomain = true;
+			if (subdomain) {
+				this.subdomain = subdomain;
+				this.hasSubdomain = true;
+				this.isFirstLoad = false;
+			}
 		});
 	}
 
@@ -69,7 +74,10 @@ export class SetupPage {
 			.subscribe( (data) => {
 				this.didConnect = true;
 				this.loader.dismiss();
-				this.navController.push( 'SettingsPage' );
+
+				if (this.isFirstLoad) {
+					this.navController.push( 'SettingsPage' );
+				}
 			}, (ex) => {
 				this.didConnect = false;
 			});
@@ -77,7 +85,7 @@ export class SetupPage {
 
 	connect() {
 		this.saveSubdomain();
-		this.arduino.setup().then(() => {
+		this.arduino.ready().then(() => {
 			this.getStatus();
 		});
 	}

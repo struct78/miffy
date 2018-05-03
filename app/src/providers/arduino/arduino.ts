@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { Config } from '../config/config';
 import 'rxjs/Rx';
 
 export enum Patterns {
@@ -23,6 +24,7 @@ export class Arduino {
 	 * @name setBrightness
 	 * @description Sets the brightness of the LEDS. Range 1 - 100. 100 being the brightest.
 	 * @param {number} brightness
+	 * @public
 	 * @return {Subject<any>} client
 	**/
 	setBrightness( brightness: number ) : Observable<any> {
@@ -33,6 +35,7 @@ export class Arduino {
 	 * @name setContrast
 	 * @description Sets the contrast of the LEDS. Range 1 - 10. 10 being high contrast.
 	 * @param {number} contrast
+	 * @public
 	 * @return {Subject<any>} client
 	**/
 	setContrast( contrast: number ) : Observable<any> {
@@ -53,6 +56,7 @@ export class Arduino {
 	 * @name setPower
 	 * @description Toggles the power of the lamp. The Arduino is still running, but the LEDs are turned off.
 	 * @param {number} power
+	 * @public
 	 * @return {Subject<any>} client
 	**/
 	setPower( power: boolean ) : Observable<any> {
@@ -64,43 +68,75 @@ export class Arduino {
 	 * @name setPattern
 	 * @description Toggles the LED algorithm.
 	 * @param {number} pattern
+	 * @public
 	 * @return {Subject<any>} client
 	**/
-	setPattern( pattern: number ) : Observable<any> {
+	public setPattern( pattern: number ) : Observable<any> {
 		return this.post( 'pattern', pattern );
 	}
 
 	/**
 	 * @name getStatus
 	 * @description Gets the status of the lamp
+	 * @public
 	 * @return {Subject<any>} client
 	**/
-	getStatus() : Observable<any> {
+	public getStatus() : Observable<any> {
 		return this.get( 'status' );
 	}
 
 	/**
 	 * @name getHealth
 	 * @description Pings the health endpoint to see if it's available
+	 * @public
 	 * @return {Subject<any>} client
 	**/
-	getHealth() : Observable<any> {
+	public getHealth() : Observable<any> {
 		return this.get( 'health' );
 	}
 
-	setup() : Promise<boolean> {
+
+	/**
+	 * @name ready
+	 * @description Sets up the service URL for the Arduino service. This must be called before any operation.
+	 * @public
+	 * @return {Promise<boolean>}
+	**/
+	public ready() : Promise<boolean> {
 		return this.storage.get( 'subdomain' ).then( ( subdomain ) => {
-			this.service_url = 'http://' + subdomain + '.getsandbox.com';
+			this.service_url = 'http://'.concat(subdomain, '.', this.getDnsProviderDomain());
 			return true;
 		});
 	}
 
+	/**
+	 * @name getDnsProviderDomain
+	 * @description Gets the domain for the DNS provider
+	 * @private
+	 * @return {string} domain
+	**/
+	private getDnsProviderDomain() : string {
+		return Config.sandbox ? Config.dns_provider.sandbox : Config.dns_provider.production;
+	}
+
+	/**
+	 * @name get
+	 * @description http get operations
+	 * @private
+	 * @return {Observable<any>} observable
+	**/
 	private get( operation: string ) : Observable<any> {
 		return this.http.get( this.service_url.concat( '/', operation ) )
 			.map( ( response: Response ) => response.json() )
 			.catch( ( response: Response ) => this.handleError( response ) );
 	}
 
+	/**
+	 * @name post
+	 * @description http post operations
+	 * @private
+	 * @return {Observable<any>} observable
+	**/
 	private post( operation: string, value: any, key?: any ) : Observable<any> {
 		let headers = new Headers( { 'Content-Type': 'application/x-www-form-urlencoded' } );
 		let requestOptions = new RequestOptions( { headers: headers } );
@@ -112,6 +148,12 @@ export class Arduino {
 			.catch( ( response: Response ) => this.handleError( response ) );
 	}
 
+	/**
+	 * @name handleError
+	 * @description returns an error object
+	 * @private
+	 * @return {Object} error
+	**/
 	private handleError( ex: Response | any ) : Observable<any> {
 		if ( ex instanceof Response ) {
 			const body = ex.json() || '';
