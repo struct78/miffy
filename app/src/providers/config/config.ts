@@ -1,8 +1,8 @@
 export let Config = {
-  sandbox: true,
+  sandbox: false,
   dns_provider: {
     sandbox: 'getsandbox.com',
-    production: 'dynu.net'
+    production: 'dynu.net/api'
   },
   loading: {
     title: 'Finding Nightlight',
